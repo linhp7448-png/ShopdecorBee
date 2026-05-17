@@ -1,0 +1,28 @@
+namespace HomeDecorShop.Application;
+
+public sealed record ProductView(
+    int ProductId,
+    string Sku,
+    string ProductName,
+    string Slug,
+    decimal Price,
+    decimal? OldPrice,
+    int CategoryId,
+    string Category,
+    string Image,
+    string HoverImage,
+    string? VideoUrl,
+    string? Tag,
+    int? SoldPercentage,
+    int StockLeft,
+    double Rating,
+    int Reviews,
+    string Brand,
+    string Color,
+    string Material,
+    string Style,
+    bool InStock,
+    bool IsActive,
+    DateTime CreatedAt,
+    string? Description,
+    ProductCategoryView? CategoryNavigation);
