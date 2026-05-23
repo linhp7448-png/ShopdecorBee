@@ -3,7 +3,7 @@
 ## Terminal 1 - Clone source
 
 ```powershell
-git clone 
+git clone
 cd TMDT_Nhom6
 ```
 
@@ -39,7 +39,7 @@ npm run dev -- --host 127.0.0.1
 ## Terminal 6 - Start ngrok
 
 ```powershell
-ngrok config add-authtoken cr_3CHoaWrCdUOtOabC06EdBZIu7cA
+ngrok config add-authtoken 3CHqDga7M0o27PcWJWmERTM55E1_5mfBKdmVUCZ5fj9QnR8FN
 ngrok http --domain=gecko-canning-viability.ngrok-free.dev 5020
 ```
 
