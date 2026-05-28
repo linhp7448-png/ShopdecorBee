@@ -1,0 +1,1172 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex font-sans text-charcoal">
+  <!-- Sidebar -->
+  <aside class="w-72 bg-charcoal text-white fixed h-full shadow-2xl z-20 flex flex-col">
+    <div class="p-6 border-b border-gray-800 flex items-center gap-3">
+      <div
+        class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-honey to-yellow-400 flex items-center justify-center font-black text-charcoal text-xl shadow-lg shadow-honey/30">
+        B
+      </div>
+      <div>
+        <h2 class="text-xl font-black text-white tracking-wider">BeeAdmin</h2>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Management</p>
+      </div>
+    </div>
+
+    <nav class="p-4 space-y-1 flex-1 mt-4 overflow-y-auto">
+      <!-- Nav Item Dashboard -->
+      <button (click)="activeTab = 'dashboard'"
+        [ngClass]="activeTab === 'dashboard' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">1</i>
+        Tổng quan
+      </button>
+
+      <!-- Nav Item Products -->
+      <button (click)="activeTab = 'products'"
+        [ngClass]="activeTab === 'products' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">2</i>
+        Sản phẩm
+      </button>
+
+      <!-- Nav Item Orders -->
+      <button (click)="activeTab = 'orders'"
+        [ngClass]="activeTab === 'orders' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">3</i>
+        Đơn hàng
+      </button>
+
+      <!-- Nav Item Customers -->
+      <button (click)="activeTab = 'customers'"
+        [ngClass]="activeTab === 'customers' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">4</i>
+        Khách hàng
+      </button>
+
+      <!-- Nav Item Marketing -->
+      <button (click)="activeTab = 'marketing'"
+        [ngClass]="activeTab === 'marketing' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">5</i>
+        Content & PR
+      </button>
+
+      <!-- Nav Item Settings -->
+      <button (click)="activeTab = 'settings'"
+        [ngClass]="activeTab === 'settings' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">6</i>
+        Hệ thống
+      </button>
+
+      <!-- Nav Item Feedback -->
+      <button (click)="activeTab = 'feedback'"
+        [ngClass]="activeTab === 'feedback' ? 'bg-honey text-charcoal font-bold shadow-honey/30 shadow-lg' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+        class="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all duration-300 group">
+        <i class="w-5 h-5 flex items-center justify-center font-black">7</i>
+        Phản hồi khách
+      </button>
+    </nav>
+
+    <div class="mt-auto p-4 border-t border-gray-800">
+      <a routerLink="/"
+        class="flex items-center gap-3 px-5 py-3.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 rounded-2xl font-medium transition-all group cursor-pointer">
+        <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Về trang chủ
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-72 flex-1 p-8 overflow-y-auto min-h-screen">
+    <!-- Top Header -->
+    <header
+      class="flex justify-between items-center mb-8 bg-white/80 backdrop-blur-xl px-8 py-5 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-white/40 sticky top-0 z-10">
+      <div>
+        <h1 class="text-3xl font-black tracking-tight capitalize text-gray-900">
+          {{ getTitle() }}
+        </h1>
+        <p class="text-gray-400 text-sm mt-0.5 font-medium">
+          Phiên làm việc Admin BeeShop 2026 • {{ adminFacade.orders().length }} đơn • {{ adminFacade.users().length }}
+          khách
+        </p>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="h-10 w-px bg-gray-200"></div>
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <p class="text-sm font-black text-gray-900">Quản trị viên</p>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Toàn quyền</p>
+          </div>
+          <div
+            class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-honey to-yellow-300 shadow-lg shadow-honey/30 flex items-center justify-center font-black text-charcoal">
+            A
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==============================
+             TAB 1: TỔNG QUAN (DASHBOARD)
+             ============================== -->
+    @if (activeTab === 'dashboard') {
+    <div class="space-y-6">
+      <!-- Thống kê chính -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-charcoal text-white rounded-[2rem] p-6 shadow-xl relative overflow-hidden group">
+          <div class="absolute -right-10 -top-10 w-32 h-32 bg-honey/20 rounded-full blur-3xl"></div>
+          <span class="text-xs font-bold text-honey uppercase tracking-widest">DOANH THU (ĐÃ THANH TOÁN)</span>
+          <h3 class="text-3xl font-black text-white mt-2">{{ formatCurrency(totalPaidRevenue) }}</h3>
+          <p class="mt-3 text-xs font-bold text-green-400">{{ paidOrdersCount }} đơn đã thanh toán</p>
+        </div>
+        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">TỔNG ĐƠN HÀNG</span>
+            <h3 class="text-4xl font-black text-gray-900 mt-2">{{ adminFacade.orders().length }}</h3>
+          </div>
+          <p class="mt-3 text-xs font-bold text-gray-500">Chờ xác nhận: <span class="text-orange-500">{{
+              adminFacade.pendingOrders() }} đơn</span></p>
+        </div>
+        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">ĐANG XỬ LÝ / GIAO</span>
+            <h3 class="text-4xl font-black text-blue-600 mt-2">{{ processingOrdersCount + shippingOrdersCount }}</h3>
+          </div>
+          <p class="mt-3 text-xs font-bold text-gray-500">Xử lý: {{ processingOrdersCount }} • Giao: {{
+            shippingOrdersCount }}</p>
+        </div>
+        <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">KHÁCH HÀNG</span>
+            <h3 class="text-4xl font-black text-gray-900 mt-2">{{ adminFacade.users().length }}</h3>
+          </div>
+          <p class="mt-3 text-xs font-bold text-green-500">Hoàn tất: {{ completedOrdersCount }} đơn</p>
+        </div>
+      </div>
+
+      <!-- Trạng thái đơn hàng tổng hợp -->
+      <div class="grid grid-cols-5 gap-4">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+          <p class="text-2xl font-black text-amber-600">{{ adminFacade.pendingOrders() }}</p>
+          <p class="text-xs font-bold text-amber-700 mt-1">Chờ thanh toán</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+          <p class="text-2xl font-black text-blue-600">{{ processingOrdersCount }}</p>
+          <p class="text-xs font-bold text-blue-700 mt-1">Đang xử lý</p>
+        </div>
+        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 text-center">
+          <p class="text-2xl font-black text-indigo-600">{{ shippingOrdersCount }}</p>
+          <p class="text-xs font-bold text-indigo-700 mt-1">Đang giao</p>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
+          <p class="text-2xl font-black text-emerald-600">{{ completedOrdersCount }}</p>
+          <p class="text-xs font-bold text-emerald-700 mt-1">Hoàn tất</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
+          <p class="text-2xl font-black text-red-500">{{ cancelledOrdersCount }}</p>
+          <p class="text-xs font-bold text-red-600 mt-1">Đã huỷ</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+        <!-- Biểu đồ doanh thu -->
+        <div class="col-span-2 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col"
+          style="min-height: 340px;">
+          <h3 class="font-black text-gray-900 mb-6">📈 Phân tích doanh thu hàng ngày</h3>
+
+          <div class="flex-1 flex flex-col relative font-sans">
+            <!-- Grid Lines & Y-Axis Scale -->
+            <div class="absolute inset-x-0 inset-y-0 flex flex-col justify-between pointer-events-none mb-8 ml-10">
+              <div class="border-b border-gray-100 w-full flex items-center gap-2">
+                <span class="text-[9px] font-bold text-gray-300 w-8 text-right">{{ formatCurrency(getChartMaxRevenue())
+                  }}</span>
+                <div class="flex-1"></div>
+              </div>
+              <div class="border-b border-gray-100 w-full flex items-center gap-2">
+                <span class="text-[9px] font-bold text-gray-300 w-8 text-right">{{ formatCurrency(getChartMaxRevenue() *
+                  0.75) }}</span>
+                <div class="flex-1"></div>
+              </div>
+              <div class="border-b border-gray-100 w-full flex items-center gap-2">
+                <span class="text-[9px] font-bold text-gray-300 w-8 text-right">{{ formatCurrency(getChartMaxRevenue() *
+                  0.5) }}</span>
+                <div class="flex-1"></div>
+              </div>
+              <div class="border-b border-gray-100 w-full flex items-center gap-2">
+                <span class="text-[9px] font-bold text-gray-300 w-8 text-right">{{ formatCurrency(getChartMaxRevenue() *
+                  0.25) }}</span>
+                <div class="flex-1"></div>
+              </div>
+              <div class="border-b-2 border-gray-200 w-full flex items-center gap-2">
+                <span class="text-[9px] font-black text-gray-400 w-8 text-right">0đ</span>
+                <div class="flex-1"></div>
+              </div>
+            </div>
+
+            <!-- Bars Area -->
+            <div class="flex-1 flex items-end ml-10 mb-8 z-10 gap-3 md:gap-5 px-4 h-full">
+              @for (item of dailyRevenueChart(); track item.date) {
+              <div class="flex-1 flex flex-col items-center group relative h-full justify-end">
+                <!-- Pop-up value on hover -->
+                <div
+                  class="absolute -top-12 scale-0 group-hover:scale-100 transition-all duration-300 bg-charcoal text-honey text-[11px] font-black px-3 py-2 rounded-xl z-20 whitespace-nowrap shadow-2xl before:content-[''] before:absolute before:top-full before:left-1/2 before:-translate-x-1/2 before:border-8 before:border-transparent before:border-t-charcoal">
+                  {{ formatCurrency(item.revenue) }}
+                </div>
+
+                <!-- The Bar -->
+                <div
+                  class="w-full max-w-[40px] rounded-t-xl transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] origin-bottom group-hover:brightness-110 group-hover:shadow-[0_0_20px_rgba(255,193,7,0.4)]"
+                  [style.height.%]="getBarHeight(item.revenue)" [style.min-height.px]="2"
+                  [ngClass]="item.revenue > 0 ? 'bg-gradient-to-t from-honey/100 to-yellow-300 shadow-honey/20 shadow-md' : 'bg-gray-100'">
+                </div>
+
+                <!-- X-Axis Labels -->
+                <div class="absolute -bottom-7 w-full text-center">
+                  <span class="text-[10px] font-black text-gray-400 group-hover:text-charcoal transition-colors">{{
+                    item.date }}</span>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Đơn hàng gần đây -->
+        <div class="col-span-1 bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 flex flex-col"
+          style="min-height: 340px;">
+          <h3 class="font-black text-gray-900 mb-4">🛒 Đơn hàng gần đây</h3>
+          <ul class="space-y-3 flex-1 overflow-y-auto pr-1">
+            @for (order of adminFacade.orders().slice(0, 8); track order.id) {
+            <li class="bg-gray-50 p-3 rounded-xl text-sm flex justify-between items-center">
+              <div>
+                <p class="font-bold text-gray-900">{{ order.orderNumber || order.orderCode }}</p>
+                <p class="text-[11px] text-gray-400">{{ order.fullName || 'Khách' }}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-black text-honey text-sm mb-1">{{ formatCurrency(order.totalAmount) }}</p>
+                <span class="text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter" [ngClass]="{
+                            'bg-emerald-50 text-emerald-600 border border-emerald-100': order.paymentStatus?.toLowerCase() === 'paid' && order.status?.toLowerCase() !== 'refunded',
+                            'bg-blue-50 text-blue-600 border border-blue-100': order.status?.toLowerCase() === 'refunded',
+                            'bg-amber-50 text-amber-600 border border-amber-100': order.paymentStatus?.toLowerCase() === 'pending' || order.paymentStatus?.toLowerCase() === 'pending_payment',
+                            'bg-red-50 text-red-600 border border-red-100': order.paymentStatus?.toLowerCase() === 'failed' || order.status?.toLowerCase() === 'cancelled'
+                          }">
+                  {{ order.status?.toLowerCase() === 'refunded' ? 'Hoàn tiền' : (order.paymentStatus?.toLowerCase() ===
+                  'paid' ? 'Đã TT' : (order.paymentStatus?.toLowerCase() === 'pending' ||
+                  order.paymentStatus?.toLowerCase() === 'pending_payment' ? 'Chờ TT' : 'Lỗi')) }}
+                </span>
+              </div>
+            </li>
+            }
+            @if (adminFacade.orders().length === 0) {
+            <li class="text-center text-gray-400 py-8">Chưa có đơn hàng</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (activeTab === 'products') {
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden font-sans">
+      <div class="flex border-b border-gray-100 bg-gray-50/50 p-2 gap-2">
+        <button class="px-5 py-2 rounded-xl bg-white shadow-sm font-black text-xs text-charcoal">Danh sách Sản
+          phẩm</button>
+      </div>
+
+      <div class="p-6">
+        <!-- Search & Add Actions -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+          <div class="relative w-full md:max-w-md group">
+            <span
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-honey transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </span>
+            <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearch($event)"
+              placeholder="Tìm theo tên hoặc mã SKU..."
+              class="w-full bg-gray-50 border-2 border-transparent rounded-[1.2rem] px-12 py-3.5 text-sm font-bold text-gray-900 focus:bg-white focus:border-honey/30 outline-none transition-all shadow-inner">
+          </div>
+
+          <button (click)="openAddProductModal()"
+            class="w-full md:w-auto bg-charcoal text-white font-black text-xs px-8 py-4 rounded-[1.2rem] hover:bg-honey hover:text-charcoal transition-all shadow-xl shadow-charcoal/20 active:scale-95 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Thêm Sản Phẩm Mới
+          </button>
+        </div>
+
+        <!-- Products Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                <th class="pb-4 px-4">Ảnh</th>
+                <th class="pb-4">Thông tin sản phẩm</th>
+                <th class="pb-4">Số lượng / Giá</th>
+                <th class="pb-4">Trạng thái</th>
+                <th class="pb-4 text-right">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              @if (productsLoading()) {
+              <tr>
+                <td colspan="5" class="py-20 text-center">
+                  <div class="flex flex-col items-center gap-3">
+                    <div class="w-10 h-10 border-4 border-honey/20 border-t-honey rounded-full animate-spin"></div>
+                    <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Đang tải danh sách...</p>
+                  </div>
+                </td>
+              </tr>
+              } @else if (products().length === 0) {
+              <tr>
+                <td colspan="5" class="py-20 text-center text-gray-400 font-bold italic">Không tìm thấy sản phẩm nào.
+                </td>
+              </tr>
+              } @else {
+              @for (product of products(); track product.productId) {
+              <tr class="group hover:bg-gray-50/50 transition-colors">
+                <td class="py-5 px-4">
+                  <div
+                    class="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden border-2 border-white shadow-sm group-hover:shadow-md transition-shadow">
+                    <img [src]="product.image || '/assets/images/placeholder.jpg'" class="w-full h-full object-cover">
+                  </div>
+                </td>
+                <td class="py-5">
+                  <p class="font-black text-charcoal leading-tight">{{ product.productName }}</p>
+                  <div class="flex items-center gap-2 mt-1.5">
+                    <span
+                      class="text-[10px] bg-gray-100 text-gray-500 font-black px-2 py-0.5 rounded-lg uppercase tracking-tighter">SKU:
+                      {{ product.sku }}</span>
+                    <span class="text-[10px] text-honey font-bold uppercase tracking-widest">{{ product.category
+                      }}</span>
+                  </div>
+                </td>
+                <td class="py-5">
+                  <p class="text-sm font-black text-charcoal">{{ formatCurrency(product.price) }}</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <div class="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div class="h-full bg-honey" [style.width.%]="(product.stockLeft / 100) * 100"></div>
+                    </div>
+                    <span class="text-[10px] font-black text-gray-400">{{ product.stockLeft }} kho</span>
+                  </div>
+                </td>
+                <td class="py-5 text-xs font-bold">
+                  <span [ngClass]="product.isActive ? 'text-emerald-500' : 'text-red-400'">
+                    {{ product.isActive ? '● Đang bán' : '○ Tạm ẩn' }}
+                  </span>
+                </td>
+                <td class="py-5 text-right">
+                  <div class="flex justify-end gap-2 pr-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button (click)="editProduct(product)"
+                      class="p-2.5 bg-gray-100 text-gray-500 hover:bg-honey hover:text-charcoal rounded-xl transition-all shadow-sm">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M18.364 5.364a9 9 0 110 12.728 2 2 0 01-2.828 0l-7.071-7.071a2 2 0 010-2.828l7.071-7.071a2 2 0 012.828 0z">
+                        </path>
+                      </svg>
+                    </button>
+                    <button (click)="deleteProduct(product.productId, $event)"
+                      class="p-2.5 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                        </path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ==============================
+             TAB 3: QUẢN LÝ ĐƠN HÀNG
+             ============================== -->
+    @if (activeTab === 'orders') {
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+      <h2 class="font-black text-xl text-gray-900 mb-6">Trạng thái Xử lý & Đơn hàng</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left bg-white">
+          <thead>
+            <tr class="bg-gray-50 text-xs font-black text-gray-500 uppercase rounded-t-xl">
+              <th class="py-3 px-4">Đơn hàng / Khách</th>
+              <th class="py-3 px-4">Sản phẩm & Ghi chú</th>
+              <th class="py-3 px-4">Thanh toán (Tổng x Phương thức)</th>
+              <th class="py-3 px-4">Trạng thái (Cập nhật)</th>
+              <th class="py-3 px-4 text-right">Hành động</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            @for (order of adminFacade.orders(); track order.id) {
+            <tr class="border-b border-gray-100 hover:bg-gray-50/50">
+              <td class="py-4 px-4">
+                <p class="font-black text-honey">#{{ order.orderNumber || order.orderCode }}</p>
+                <p class="font-bold text-gray-800">{{ order.fullName || 'Khách' }}</p>
+                <p class="text-xs text-gray-500">{{ order.city || 'Không rõ' }}</p>
+              </td>
+              <td class="py-4 px-4">
+                <p class="font-medium text-gray-800">{{ order.items?.length || 0 }} sản phẩm</p>
+                @if (order.notes || order['Notes']) {
+                <p class="text-xs text-orange-600 italic">"{{ order.notes || order['Notes'] }}"</p>
+                }
+              </td>
+              <td class="py-4 px-4 text-gray-900">
+                <p class="font-black text-lg">{{ formatCurrency(order.totalAmount) }}</p>
+                <span class="text-xs font-bold px-2 py-0.5 inline-block rounded mt-1" [ngClass]="{
+                            'text-green-600 bg-green-50': order.paymentStatus?.toLowerCase() === 'paid',
+                            'text-blue-600 bg-blue-50': order.status?.toLowerCase() === 'refunded',
+                            'text-amber-600 bg-amber-50': order.paymentStatus?.toLowerCase() === 'pending' || order.paymentStatus?.toLowerCase() === 'pending_payment',
+                            'text-red-600 bg-red-50': order.paymentStatus?.toLowerCase() === 'failed' || order.status?.toLowerCase() === 'cancelled'
+                          }">
+                  @if (order.status?.toLowerCase() === 'refunded') {
+                  Đã Hoàn Tiền
+                  } @else if (order.paymentStatus?.toLowerCase() === 'paid') {
+                  Đã Thanh Toán
+                  } @else if (order.paymentStatus?.toLowerCase() === 'pending' || order.paymentStatus?.toLowerCase() ===
+                  'pending_payment') {
+                  Chờ TT
+                  } @else if (order.status?.toLowerCase() === 'cancelled') {
+                  Đã Hủy
+                  } @else {
+                  Lỗi
+                  }
+                </span>
+              </td>
+              <td class="py-4 px-4">
+                <!-- Dropdown Cập nhật trạng thái -->
+                <select
+                  class="border border-gray-300 rounded-lg px-2 py-1.5 text-xs font-bold bg-white text-gray-700 outline-none w-full">
+                  <option value="pendingPayment" [selected]="order.status?.toLowerCase() === 'pendingpayment'">Chờ xác
+                    nhận</option>
+                  <option value="processing" [selected]="order.status?.toLowerCase() === 'processing'">Đang xử lý
+                  </option>
+                  <option value="shipping"
+                    [selected]="order.status?.toLowerCase() === 'shipping' || order.status?.toLowerCase() === 'shipped'">
+                    Đang giao hàng</option>
+                  <option value="completed" [selected]="order.status?.toLowerCase() === 'completed'">Hoàn thành</option>
+                  <option value="cancelled" [selected]="order.status?.toLowerCase() === 'cancelled'">Đã hủy</option>
+                  <option value="refund_requested" [selected]="order.status?.toLowerCase() === 'refund_requested'"
+                    disabled>Yêu cầu khiếu nại</option>
+                  <option value="refunded" [selected]="order.status?.toLowerCase() === 'refunded'" disabled>Đã hoàn tiền
+                  </option>
+                </select>
+              </td>
+              <td class="py-4 px-4 text-right">
+                <div class="flex flex-col gap-2 items-end">
+                  @if (order.status?.toLowerCase() === 'refund_requested') {
+                  <div class="flex gap-1 animate-in fade-in zoom-in duration-300">
+                    <button (click)="processRefundRequest(order.id, true)"
+                      class="p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg transition-all border border-emerald-100 shadow-sm"
+                      title="Chấp nhận hoàn tiền">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                    </button>
+                    <button (click)="processRefundRequest(order.id, false)"
+                      class="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-all border border-red-100 shadow-sm"
+                      title="Từ chối khiếu nại">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                      </svg>
+                    </button>
+                  </div>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+
+    <!-- ==============================
+             TAB 4: QUẢN LÝ KHÁCH HÀNG
+             ============================== -->
+    @if (activeTab === 'customers') {
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+      <h2 class="font-black text-xl text-gray-900 mb-6">Tài khoản & Lịch sử Khách hàng</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-gray-100 text-xs font-black text-gray-400 uppercase tracking-widest">
+              <th class="pb-3 px-2">Khách hàng</th>
+              <th class="pb-3 px-2">Lịch sử Mua hàng</th>
+              <th class="pb-3 px-2">Phân loại VIP</th>
+              <th class="pb-3 px-2 text-right">Bảo mật (Khóa ban)</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-gray-50">
+              <td class="py-4 px-2">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-blue-100 text-blue-600 font-black flex items-center justify-center rounded-full">
+                    L</div>
+                  <div>
+                    <p class="font-bold text-gray-900">Lê Thế Anh</p>
+                    <p class="text-[11px] text-gray-400">theanh@gmail.com</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-2">
+                <p class="font-black text-charcoal">Đã mua 15 đơn</p>
+                <p class="text-xs font-medium text-gray-500">Tổng chi tiêu: <span
+                    class="text-green-600 font-bold">45,800,000đ</span></p>
+              </td>
+              <td class="py-4 px-2">
+                <span
+                  class="bg-yellow-100 text-yellow-700 font-black text-[10px] uppercase px-3 py-1 rounded-full shadow-sm">Khách
+                  VIP (Vàng)</span>
+              </td>
+              <td class="py-4 px-2 text-right">
+                <button
+                  class="bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-600 transition-colors font-bold text-xs px-4 py-2 rounded-xl">
+                  Khóa (Ban)
+                </button>
+              </td>
+            </tr>
+            <tr class="border-b border-gray-50">
+              <td class="py-4 px-2">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-gray-100 text-gray-600 font-black flex items-center justify-center rounded-full">
+                    S</div>
+                  <div>
+                    <p class="font-bold text-gray-900">Spammer123</p>
+                    <p class="text-[11px] text-gray-400">fake.email@spam.com</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-2">
+                <p class="font-bold text-gray-600">Đã mua 3 đơn</p>
+                <p class="text-xs font-bold text-red-500">Tỷ lệ bùng hàng: 100%</p>
+              </td>
+              <td class="py-4 px-2">
+                <span class="bg-gray-100 text-gray-500 font-black text-[10px] uppercase px-3 py-1 rounded-full">Khách
+                  mới</span>
+              </td>
+              <td class="py-4 px-2 text-right">
+                <button
+                  class="bg-red-100 text-red-600 border border-red-200 font-bold text-xs px-4 py-2 rounded-xl mr-2">
+                  Mở Khóa
+                </button>
+                <span class="text-xs font-bold text-red-600 italic">Đã Ban</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    }
+
+
+    <!-- ==============================
+             TAB 6: CONTENT & MARKETING
+             ============================== -->
+    @if (activeTab === 'marketing') {
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <!-- Mã giảm giá -->
+      <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex flex-col">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+          <h2 class="font-black text-xl text-gray-900">Mã giảm giá (Coupons)</h2>
+          <button class="bg-honey text-charcoal font-bold text-xs px-3 py-1.5 rounded-lg">+ Tạo Mã</button>
+        </div>
+        <div class="flex-1 space-y-3">
+          <!-- Item -->
+          <div
+            class="border border-dashed border-gray-300 rounded-2xl p-4 flex justify-between items-center bg-gray-50">
+            <div>
+              <h3 class="font-black text-honey text-lg uppercase tracking-wider">TET2026</h3>
+              <p class="text-xs font-bold text-gray-600">-20% cho Đơn từ 1 Triệu</p>
+              <p class="text-[10px] text-gray-400 mt-1">Hết hạn: 15/02/2026 (Còn 150 lượt)</p>
+            </div>
+            <button class="text-red-500 hover:text-red-700 font-bold text-xs"><svg class="w-5 h-5" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+              </svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner & Blog -->
+      <div class="space-y-6 flex flex-col">
+        <!-- Banner -->
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="font-black text-lg text-gray-900">Quản lý Banner/Slider</h2>
+            <button class="text-blue-600 font-bold text-xs hover:underline">Chỉnh sửa Homepage</button>
+          </div>
+          <div
+            class="h-24 bg-gray-200 rounded-xl flex items-center justify-center font-black text-gray-400 border border-gray-300 border-dashed relative overflow-hidden group">
+            <p class="z-10 bg-white/80 px-3 py-1 rounded-full text-sm">Banner_Tet_Main.jpg</p>
+            <div
+              class="absolute inset-0 bg-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <button class="bg-white px-4 py-2 rounded-lg font-bold shadow text-sm">Thay đổi hình</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blog -->
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex-1">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="font-black text-lg text-gray-900">Blog / Tin Mẹo (SEO)</h2>
+            <button class="bg-gray-100 text-charcoal font-bold text-xs px-3 py-1.5 rounded-lg hover:bg-gray-200">Viết
+              bài mới</button>
+          </div>
+          <ul class="space-y-2">
+            <li class="flex gap-4 items-center bg-gray-50 p-2 rounded-lg">
+              <div class="w-10 h-10 bg-gray-300 rounded"></div>
+              <div class="flex-1">
+                <p class="font-bold text-sm line-clamp-1">5 Mẹo trang trí phòng ngủ Minimalism</p>
+                <p class="text-[10px] text-gray-500">Người đăng: Content_B • Lượt xem: 2.1k</p>
+              </div>
+              <button class="text-blue-600 text-xs font-bold mr-2">Sửa</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ==============================
+             TAB 6: TÙY CHỈNH HỆ THỐNG
+             ============================== -->
+    @if (activeTab === 'settings') {
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6">
+      <h2 class="font-black text-2xl text-gray-900 mb-6">Cài đặt Hệ thống & Phân Quyền</h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <!-- Cấu hình chung -->
+        <div>
+          <h3 class="font-bold text-lg text-charcoal mb-4 border-b border-gray-100 pb-2">Cấu hình Cửa hàng</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-1">Tên cửa hàng (Logo text)</label>
+              <input type="text" value="BeeShop - Phụ Kiện Decor"
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-honey">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-1">Cấu hình Thuế (VAT %)</label>
+              <input type="number" value="10"
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-honey">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 mb-1">Phí Giao Hàng Mặc Định (VNĐ)</label>
+              <input type="text" value="30,000"
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 outline-none focus:border-honey">
+            </div>
+            <button
+              class="bg-charcoal text-white font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-honey hover:text-charcoal w-full mt-2">Lưu
+              Cấu Hình</button>
+          </div>
+        </div>
+
+        <!-- Phân quyền hiển thị Info -->
+        <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200">
+          <h3 class="font-bold text-lg text-charcoal mb-4">Các Quyền Quản Trị (Role-based)</h3>
+          <ul class="space-y-4">
+            <li class="flex gap-3 items-start">
+              <span class="w-3 h-3 rounded-full bg-red-500 mt-1 flex-shrink-0"></span>
+              <div>
+                <p class="font-black text-sm">Admin (Toàn quyền)</p>
+                <p class="text-xs text-gray-600 mt-0.5">Truy cập tất cả 6 tab. Quản trị được Doanh thu, Khách hàng, Cài
+                  đặt Hệ thống.</p>
+              </div>
+            </li>
+            <li class="flex gap-3 items-start">
+              <span class="w-3 h-3 rounded-full bg-blue-500 mt-1 flex-shrink-0"></span>
+              <div>
+                <p class="font-black text-sm">Sale (Nhân viên Sale)</p>
+                <p class="text-xs text-gray-600 mt-0.5">Chỉ được xem Dashboard (ẩn doanh thu), và full quyền xử lý Đơn
+                  hàng.</p>
+              </div>
+            </li>
+            <li class="flex gap-3 items-start">
+              <span class="w-3 h-3 rounded-full bg-green-500 mt-1 flex-shrink-0"></span>
+              <div>
+                <p class="font-black text-sm">Content (Nhãn viên Content)</p>
+                <p class="text-xs text-gray-600 mt-0.5">Chỉ được phép vào tab Sản Phẩm (Thêm sửa ảnh/mô tả) và tab
+                  Content & Marketing.</p>
+              </div>
+            </li>
+          </ul>
+          <div class="mt-6 pt-4 border-t border-gray-200 text-center">
+            <p class="text-xs text-gray-400 font-bold italic">Việc phân quyền cụ thể đang được xử lý bằng Backend/Guard
+              của Angular.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- ==============================
+             TAB 7: PHẢN HỒI KHÁCH HÀNG
+             ============================== -->
+    @if (activeTab === 'feedback') {
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+      <div class="flex justify-between items-center mb-8">
+        <div>
+          <h2 class="font-black text-2xl text-charcoal tracking-tight">Cảm nghĩ & Góp ý</h2>
+          <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Quản lý phản hồi trực tiếp từ khách hàng</p>
+        </div>
+        <div class="bg-honey/10 text-honey px-4 py-2 rounded-2xl font-black text-sm border border-honey/20">
+          {{ adminFacade.feedback().length }} Feedback
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6">
+        @for (item of adminFacade.feedback(); track item.id) {
+          <div class="group bg-gray-50/50 hover:bg-white border border-gray-100 hover:border-honey/20 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-honey/5">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-gray-100 to-gray-200 flex items-center justify-center font-black text-charcoal shadow-inner">
+                  {{ item.name.charAt(0) }}
+                </div>
+                <div>
+                  <h3 class="font-black text-charcoal text-lg leading-none">{{ item.name }}</h3>
+                  <p class="text-xs text-gray-400 font-medium mt-1">{{ item.email }}</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-gray-100 italic">
+                {{ item.createdAt | date:'HH:mm • dd/MM/yyyy' }}
+              </span>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 border border-gray-50 mb-4 shadow-sm">
+              <p class="text-gray-700 leading-relaxed font-medium">"{{ item.content }}"</p>
+            </div>
+
+            <!-- Admin Reply Display -->
+            @if (item.adminReply) {
+              <div class="ml-8 mt-4 p-5 bg-honey/5 border-l-4 border-honey rounded-r-3xl animate-in slide-in-from-left duration-500">
+                <div class="flex justify-between items-center mb-2">
+                  <p class="text-[10px] font-black text-honey uppercase tracking-[0.2em]">Cửa hàng đã phản hồi:</p>
+                  <span class="text-[10px] text-honey/60 italic font-bold">{{ item.repliedAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <p class="text-sm text-gray-800 font-black leading-relaxed">{{ item.adminReply }}</p>
+              </div>
+            } @else {
+              <!-- Reply Action -->
+              <div class="flex justify-end mt-2">
+                @if (replyingId !== item.id) {
+                  <button (click)="startReply(item.id)"
+                    class="bg-charcoal text-white text-[10px] font-black uppercase tracking-widest px-6 py-2.5 rounded-xl hover:bg-honey hover:text-charcoal transition-all active:scale-95 shadow-lg shadow-charcoal/10">
+                    Phản hồi khách
+                  </button>
+                }
+              </div>
+
+              <!-- Reply Form -->
+              @if (replyingId === item.id) {
+                <div class="mt-4 p-6 bg-white border-2 border-honey/30 rounded-[2rem] shadow-xl animate-in zoom-in-95 duration-300">
+                  <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Nội dung phản hồi:</label>
+                  <textarea [(ngModel)]="replyText" 
+                    placeholder="Nhập lời cảm ơn hoặc giải đáp thắc mắc..."
+                    class="w-full h-32 bg-gray-50 border-none rounded-2xl p-4 text-sm font-bold text-gray-900 focus:bg-white focus:ring-2 focus:ring-honey/20 outline-none transition-all resize-none"></textarea>
+                  
+                  <div class="flex justify-end gap-3 mt-4">
+                    <button (click)="cancelReply()"
+                      class="px-5 py-2 text-[10px] font-black text-gray-400 hover:text-charcoal uppercase tracking-widest transition-colors">
+                      Hủy bỏ
+                    </button>
+                    <button (click)="submitReply(item.id)"
+                      [disabled]="!replyText.trim()"
+                      class="bg-honey text-charcoal text-[10px] font-black uppercase tracking-widest px-8 py-2.5 rounded-xl hover:shadow-lg hover:shadow-honey/30 transition-all active:scale-95 disabled:opacity-50">
+                      Gửi phản hồi
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+
+        @if (adminFacade.feedback().length === 0) {
+          <div class="py-20 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+            <div class="text-4xl mb-4">🧊</div>
+            <p class="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Chưa có phản hồi nào từ khách hàng</p>
+          </div>
+        }
+      </div>
+    </div>
+    }
+  </main>
+
+  <!-- Professional Confirmation Modal -->
+  @if (showConfirmModal()) {
+  <div class="fixed inset-0 z-[120] flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-charcoal/80 backdrop-blur-md transition-opacity" (click)="closeConfirmModal()">
+    </div>
+
+    <!-- Modal Content -->
+    <div
+      class="relative w-full max-w-sm overflow-hidden rounded-[2.5rem] bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] transition-all scale-100 animate-in zoom-in-95 duration-300">
+      <div class="p-8 text-center">
+        <div class="mb-6 flex justify-center">
+          <div
+            [ngClass]="confirmModalData()?.approve ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 'bg-red-50 text-red-500 border-red-100'"
+            class="w-16 h-16 rounded-2xl border flex items-center justify-center shadow-inner">
+            @if (confirmModalData()?.approve) {
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            } @else {
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+              </path>
+            </svg>
+            }
+          </div>
+        </div>
+
+        <h3 class="text-xl font-black text-charcoal tracking-tight mb-2">
+          {{ confirmModalData()?.approve ? 'Xác nhận hoàn tiền' : 'Từ chối yêu cầu' }}
+        </h3>
+        <p class="text-xs text-gray-400 font-medium leading-relaxed mb-8">
+          Thực hiện hành động cho đơn <span class="text-honey font-bold">#{{ confirmModalData()?.orderNumber }}</span>?
+        </p>
+
+        <div class="flex flex-col gap-2">
+          <button (click)="confirmProcessRefund()" [disabled]="isActionRunning"
+            [ngClass]="confirmModalData()?.approve ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-red-500 hover:bg-red-600'"
+            class="w-full py-3 rounded-xl text-white text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-2">
+            @if (isActionRunning) {
+            <svg class="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            }
+            Xác nhận
+          </button>
+          <button (click)="closeConfirmModal()" [disabled]="isActionRunning"
+            class="w-full py-2 text-[10px] font-black text-gray-300 hover:text-charcoal transition-colors uppercase tracking-widest">
+            Hủy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ==============================
+           PRODUCT MODAL (Add/Edit)
+           ============================== -->
+  @if (showProductModal()) {
+  <div class="fixed inset-0 z-[130] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-charcoal/80 backdrop-blur-md" (click)="closeProductModal()"></div>
+
+    <div
+      class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] bg-white shadow-2xl animate-in zoom-in-95 duration-300 font-sans">
+      <!-- Modal Header -->
+      <div
+        class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 p-8 flex justify-between items-center z-10">
+        <div>
+          <h3 class="text-2xl font-black text-gray-900 leading-none">{{ isEditing() ? 'Chỉnh sửa sản phẩm' : 'Thêm sản
+            phẩm mới' }}</h3>
+          <p class="text-xs text-gray-400 font-bold mt-2 uppercase tracking-widest">Điền thông tin chi tiết bên dưới</p>
+        </div>
+        <button (click)="closeProductModal()"
+          class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="p-8 space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Media Upload Section -->
+          <div class="space-y-6">
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest border-l-4 border-honey pl-3">Hình ảnh
+              sản phẩm</p>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-3">
+                <label class="block text-[11px] font-black text-gray-500 uppercase">Ảnh chính</label>
+                <div
+                  class="aspect-square rounded-[1.5rem] bg-gray-50 border-2 border-dashed border-gray-200 relative group flex items-center justify-center overflow-hidden">
+                  @if (productForm.image) {
+                  <img [src]="getAbsoluteImageUrl(productForm.image)" class="w-full h-full object-contain">
+                  } @else {
+                  <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                  </svg>
+                  }
+                  <input type="file" (change)="onImageUpload($event, 'image')"
+                    class="absolute inset-0 opacity-0 cursor-pointer">
+                  <div
+                    class="absolute inset-x-0 bottom-0 bg-charcoal/60 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-[9px] text-white font-black uppercase">Tải ảnh lên</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <label class="block text-[11px] font-black text-gray-500 uppercase">Ảnh hover</label>
+                <div
+                  class="aspect-square rounded-[1.5rem] bg-gray-50 border-2 border-dashed border-gray-200 relative group flex items-center justify-center overflow-hidden">
+                  @if (productForm.hoverImage) {
+                  <img [src]="getAbsoluteImageUrl(productForm.hoverImage)" class="w-full h-full object-contain">
+                  } @else {
+                  <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                  </svg>
+                  }
+                  <input type="file" (change)="onImageUpload($event, 'hoverImage')"
+                    class="absolute inset-0 opacity-0 cursor-pointer">
+                  <div
+                    class="absolute inset-x-0 bottom-0 bg-charcoal/60 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-[9px] text-white font-black uppercase">Tải ảnh lên</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Section -->
+          <div class="space-y-6">
+            <p class="text-xs font-black text-gray-400 uppercase tracking-widest border-l-4 border-honey pl-3">Thông tin
+              cơ bản</p>
+
+            <div class="grid grid-cols-2 gap-4">
+              <!-- SKU Selection -->
+              <div class="space-y-2 relative">
+                <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Mã SKU</label>
+                <input type="text" [(ngModel)]="productForm.sku" (focus)="showSuggestions('sku')"
+                  (blur)="hideSuggestions()"
+                  class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all uppercase"
+                  placeholder="BEE-CHAIR-001">
+
+                @if (activeSuggestionField() === 'sku' && getFilteredSuggestions('sku').length > 0) {
+                <div
+                  class="absolute z-[140] left-0 right-0 top-[calc(100%+4px)] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <p class="px-4 py-2 text-[9px] font-black text-gray-300 uppercase">Gợi ý mã thông minh</p>
+                  @for (item of getFilteredSuggestions('sku'); track item) {
+                  <button (mousedown)="selectSuggestion('sku', item)"
+                    class="w-full text-left px-4 py-2.5 text-xs font-black text-honey hover:bg-honey hover:text-charcoal transition-colors">
+                    {{ item }}
+                  </button>
+                  }
+                </div>
+                }
+              </div>
+
+              <!-- Slug Selection -->
+              <div class="space-y-2 relative">
+                <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Slug</label>
+                <input type="text" [(ngModel)]="productForm.slug" (focus)="showSuggestions('slug')"
+                  (blur)="hideSuggestions()"
+                  class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all"
+                  placeholder="ghe-go-cao-cap">
+
+                @if (activeSuggestionField() === 'slug' && getFilteredSuggestions('slug').length > 0) {
+                <div
+                  class="absolute z-[140] left-0 right-0 top-[calc(100%+4px)] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <p class="px-4 py-2 text-[9px] font-black text-gray-300 uppercase">Gợi ý đường dẫn</p>
+                  @for (item of getFilteredSuggestions('slug'); track item) {
+                  <button (mousedown)="selectSuggestion('slug', item)"
+                    class="w-full text-left px-4 py-2.5 text-xs font-bold text-gray-700 hover:bg-honey hover:text-charcoal transition-colors">
+                    {{ item }}
+                  </button>
+                  }
+                </div>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Tên sản phẩm</label>
+              <input type="text" [(ngModel)]="productForm.name" (ngModelChange)="onNameChange()"
+                class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all"
+                placeholder="VD: Ghế gỗ Decor cao cấp">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Giá bán</label>
+                <input type="number" [(ngModel)]="productForm.price"
+                  class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-black text-honey focus:bg-white focus:border-honey/30 outline-none transition-all">
+              </div>
+              <div class="space-y-2">
+                <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Giá gốc</label>
+                <input type="number" [(ngModel)]="productForm.originalPrice"
+                  class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-bold text-gray-400 focus:bg-white focus:border-honey/30 outline-none transition-all">
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-[11px] font-black text-gray-500 uppercase ml-1">Danh mục</label>
+              <select (change)="onCategoryChange($event)"
+                class="w-full bg-gray-50 border-2 border-transparent rounded-2xl px-5 py-3 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all appearance-none">
+                @for (cat of categories(); track cat.id) {
+                <option [value]="cat.id" [selected]="cat.id === productForm.categoryId">{{ cat.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extra -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Brand Selection with Chip Grid -->
+          <div class="space-y-3 relative">
+            <label class="text-[10px] text-gray-400 font-black uppercase ml-1">Thương hiệu (Hãng)</label>
+            <input type="text" [(ngModel)]="productForm.brand"
+              class="w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-2.5 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all"
+              placeholder="VD: Ikea, BeeShop...">
+
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (item of brandSuggestions(); track item) {
+              <button (click)="productForm.brand = item"
+                [ngClass]="productForm.brand === item ? 'bg-honey text-charcoal shadow-honey/30 shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black transition-all active:scale-95 uppercase tracking-tighter">
+                {{ item }}
+              </button>
+              }
+            </div>
+          </div>
+
+          <!-- Material Selection with Chip Grid -->
+          <div class="space-y-3 relative">
+            <label class="text-[10px] text-gray-400 font-black uppercase ml-1">Chất liệu</label>
+            <input type="text" [(ngModel)]="productForm.material"
+              class="w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-2.5 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all"
+              placeholder="Gỗ, Gốm sứ...">
+
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (item of materialSuggestions(); track item) {
+              <button (click)="productForm.material = item"
+                [ngClass]="productForm.material === item ? 'bg-honey text-charcoal shadow-honey/30 shadow-md' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black transition-all active:scale-95 uppercase tracking-tighter">
+                {{ item }}
+              </button>
+              }
+            </div>
+          </div>
+
+          <!-- Style Selection with Chip Grid -->
+          <div class="space-y-3 relative">
+            <label class="text-[10px] text-gray-400 font-black uppercase ml-1">Phong cách</label>
+            <input type="text" [(ngModel)]="productForm.style"
+              class="w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-2.5 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all"
+              placeholder="Modern, Nordic...">
+
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (item of styleSuggestions(); track item) {
+              <button (click)="productForm.style = item"
+                [ngClass]="productForm.style === item ? 'bg-honey text-charcoal shadow-honey/30 shadow-md' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'"
+                class="px-3 py-1.5 rounded-lg text-[10px] font-black transition-all active:scale-95 uppercase tracking-tighter">
+                {{ item }}
+              </button>
+              }
+            </div>
+          </div>
+
+          <!-- Stock Selection with Quick Presets -->
+          <div class="space-y-3">
+            <label class="text-[10px] text-gray-400 font-black uppercase ml-1">Số lượng kho</label>
+            <input type="number" [(ngModel)]="productForm.stockLeft"
+              class="w-full bg-gray-50 border-2 border-transparent rounded-xl px-4 py-2.5 text-sm font-bold focus:bg-white focus:border-honey/30 outline-none transition-all">
+
+            <div class="flex flex-wrap gap-1.5 mt-2 text-center">
+              @for (item of ['10', '50', '100', '500']; track item) {
+              <button (click)="productForm.stockLeft = +item"
+                [ngClass]="productForm.stockLeft === +item ? 'bg-honey text-charcoal shadow-honey/30 shadow-md' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                class="flex-1 px-2 py-1.5 rounded-lg text-[10px] font-black transition-all active:scale-95">
+                {{ item }}
+              </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="productForm.isActive" class="w-4 h-4 accent-honey">
+            <span class="text-xs font-black text-gray-600 uppercase">Hiển thị bán</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="productForm.inStock" class="w-4 h-4 accent-honey">
+            <span class="text-xs font-black text-gray-600 uppercase">Còn hàng</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-8 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3 rounded-b-[2.5rem]">
+        <button (click)="closeProductModal()"
+          class="px-8 py-3.5 rounded-2xl text-xs font-black text-gray-400 hover:text-charcoal transition-colors uppercase tracking-widest">Hủy
+          bỏ</button>
+        <button (click)="saveProduct()" [disabled]="isUploading"
+          class="px-10 py-3.5 bg-honey text-charcoal font-black text-xs rounded-2xl shadow-xl shadow-honey/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+          @if (isUploading) {
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          }
+          {{ isEditing() ? 'Cập nhật' : 'Thêm mới' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Professional Toast Notifications -->
+  <div class="fixed bottom-8 right-8 z-[110] flex flex-col gap-3 font-sans">
+    @if (toast()) {
+    <div [ngClass]="toast()?.type === 'success' ? 'bg-green-600' : 'bg-red-600'"
+      class="flex items-center gap-3 px-6 py-4 rounded-2xl text-white shadow-2xl animate-in slide-in-from-right-full duration-500">
+      @if (toast()?.type === 'success') {
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      } @else {
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      }
+      <p class="text-sm font-black">{{ toast()?.message }}</p>
+      <button (click)="hideToast()" class="ml-2 hover:opacity-70 transition-opacity">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    }
+  </div>
+</div>

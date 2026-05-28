@@ -1,0 +1,812 @@
+{
+  "info": {
+    "_postman_id": "shopdecorbee-order-tuan1",
+    "name": "Order Service - Tuần 1 Test Cases",
+    "description": "Mau Postman theo format TC-ORD-XX (giong ban).\n\nChay Collection Runner folder theo thu tu.\nCan: API http://localhost:5020 + Environment ShopdecorBee Local.\n\nTruoc khi chay: Seed All + Login (hoac chay folder Setup).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Setup - Đăng nhập lấy Token",
+      "item": [
+        {
+          "name": "POST Login - User thường",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SETUP-01: Login user thành công - Status 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('TC-SETUP-01: Response có token', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.token).to.be.a('string').and.not.empty;",
+                  "    pm.environment.set('customerToken', data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "POST Login - Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SETUP-02: Login admin thành công - Status 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('TC-SETUP-02: Admin token được lưu', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.token).to.be.a('string').and.not.empty;",
+                  "    pm.environment.set('adminToken', data.token);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "POST Chuẩn bị giỏ hàng (add product)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "if (!pm.environment.get('productId')) {",
+                  "    pm.environment.set('productId', '1');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-SETUP-03: Thêm SP vào giỏ - Status 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('TC-SETUP-03: Giỏ có ít nhất 1 item', () => {",
+                  "    const cart = pm.response.json();",
+                  "    pm.expect(cart.items.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/cart/items"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 1. Tạo đơn hàng",
+      "item": [
+        {
+          "name": "POST TC-ORD-01: Tạo đơn thành công",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-01: Status 201 Created', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('TC-ORD-01: Response có id và orderNumber', () => {",
+                  "    const o = pm.response.json();",
+                  "    pm.expect(o.id).to.be.a('number');",
+                  "    pm.expect(o.orderNumber).to.be.a('string');",
+                  "    pm.environment.set('orderId', o.id);",
+                  "    pm.environment.set('orderIdForPayment', o.id);",
+                  "});",
+                  "pm.test('TC-ORD-01: Trạng thái pending_payment', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('pending_payment');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"TC-ORD-01 tao don\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "POST TC-ORD-02: Tạo đơn không token - Expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-02: Status 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "POST TC-ORD-03: Tạo đơn giỏ trống - Expect 4xx",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "    url: pm.environment.get('baseUrl') + '/api/cart/items',",
+                  "    method: 'DELETE',",
+                  "    header: { Authorization: 'Bearer ' + pm.environment.get('customerToken') }",
+                  "}, () => {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-03: Giỏ trống không tạo được đơn', () => {",
+                  "    pm.expect([400, 404, 409]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "POST TC-ORD-04: Chuẩn bị giỏ + tạo đơn thứ 2 (cho hủy)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-04: Add cart OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/cart/items"
+          }
+        },
+        {
+          "name": "POST TC-ORD-04b: Tạo đơn thứ 2 (orderCancelId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-04: Status 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('orderCancelId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van Cancel\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\",\n  \"notes\": \"Don de huy\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 2. Xem đơn hàng",
+      "item": [
+        {
+          "name": "GET TC-ORD-05: User xem danh sách đơn của mình",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-05: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-05: Response là mảng', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "GET TC-ORD-06: User xem chi tiết đơn theo ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-06: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-06: Đúng order id', () => {",
+                  "    pm.expect(pm.response.json().id).to.eql(parseInt(pm.environment.get('orderId')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}"
+          }
+        },
+        {
+          "name": "GET TC-ORD-07: Xem đơn ID không tồn tại - Expect 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-07: Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/999999"
+          }
+        },
+        {
+          "name": "GET TC-ORD-08: Xem đơn không token - Expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-08: Status 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 3. Hủy đơn hàng",
+      "item": [
+        {
+          "name": "POST TC-ORD-09: Hủy đơn pending_payment thành công",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-09: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-09: Trạng thái cancelled', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('cancelled');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderCancelId}}/cancel"
+          }
+        },
+        {
+          "name": "POST TC-ORD-10: Hủy đơn đã hủy - Expect 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-10: Status 409 Conflict', () => {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderCancelId}}/cancel"
+          }
+        },
+        {
+          "name": "POST TC-ORD-11: Hủy đơn ID không tồn tại - Expect 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-11: Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/999999/cancel"
+          }
+        },
+        {
+          "name": "POST TC-ORD-12: Hủy đơn không token - Expect 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-12: Status 401', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/orders/{{orderId}}/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 4. Admin - Cập nhật trạng thái đơn",
+      "item": [
+        {
+          "name": "GET TC-ORD-13: Admin xem tất cả đơn hàng",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-13: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-13: Response là mảng', () => {",
+                  "    pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+            },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/admin/orders"
+          }
+        },
+        {
+          "name": "PATCH TC-ORD-14: Admin cập nhật TT -> processing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-14: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-14: Status = processing', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('processing');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "query": [{ "key": "status", "value": "processing" }]
+            }
+          }
+        },
+        {
+          "name": "PATCH TC-ORD-15: Admin cập nhật TT -> completed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-15: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-15: Status = completed', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('completed');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=completed",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "query": [{ "key": "status", "value": "completed" }]
+            }
+          }
+        },
+        {
+          "name": "PATCH TC-ORD-16: User thường cập nhật TT đơn - Expect 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-16: Status 403 Forbidden', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "query": [{ "key": "status", "value": "processing" }]
+            }
+          }
+        },
+        {
+          "name": "PATCH TC-ORD-17: Admin cập nhật TT đơn ID không tồn tại - Expect 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-17: Status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/999999/status?status=processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "999999", "status"],
+              "query": [{ "key": "status", "value": "processing" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 5. Yêu cầu hoàn tiền (Khiếu nại)",
+      "item": [
+        {
+          "name": "POST Chuẩn bị: Add cart + tạo đơn cho refund",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Setup refund: add cart OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/cart/items"
+          }
+        },
+        {
+          "name": "POST Setup: Tạo đơn refundOrderId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.environment.set('refundOrderId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Refund Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders"
+          }
+        },
+        {
+          "name": "POST Setup: Thanh toán COD cho refundOrderId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Setup: payment OK', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{refundOrderId}},\n  \"method\": \"cod\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          }
+        },
+        {
+          "name": "POST TC-ORD-18: User gửi yêu cầu hoàn tiền",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-18: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-18: Status refund_requested', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('refund_requested');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"San pham loi - TC-ORD-18\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders/{{refundOrderId}}/request-refund"
+          }
+        },
+        {
+          "name": "POST TC-ORD-19: Admin duyệt hoàn tiền approve=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-19: Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('TC-ORD-19: Status refunded', () => {",
+                  "    pm.expect(pm.response.json().status).to.eql('refunded');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/{{refundOrderId}}/process-refund?approve=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "orders", "{{refundOrderId}}", "process-refund"],
+              "query": [{ "key": "approve", "value": "true" }]
+            }
+          }
+        },
+        {
+          "name": "POST TC-ORD-20: Hoàn tiền lại đơn đã refunded - Expect 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('TC-ORD-20: Status 409', () => pm.response.to.have.status(409));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Khiếu nại lần 2\"\n}"
+            },
+            "url": "{{baseUrl}}/api/orders/{{refundOrderId}}/request-refund"
+          }
+        }
+      ]
+    }
+  ]
+}
