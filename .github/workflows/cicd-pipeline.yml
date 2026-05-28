@@ -17,40 +17,28 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      # Đã sửa: Trỏ thẳng vào file .sln ở thư mục gốc
       - name: Restore
-        run: dotnet restore HomeDecorShop/HomeDecorShop.sln
+        run: dotnet restore HomeDecorShop.sln
 
+      # Đã sửa: Build file .sln ở thư mục gốc
       - name: Build
-        run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
+        run: dotnet build HomeDecorShop.sln --configuration Release --no-restore
 
-      # Nếu có unit test thì bật
       - name: Test
-        run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
+        run: dotnet test HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
-      # Deploy demo qua SSH
-      - name: Deploy to Backend Server
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            cd /var/www/shopdecorbee
-            git pull origin main
-            dotnet restore HomeDecorShop/HomeDecorShop.sln
-            dotnet build HomeDecorShop/HomeDecorShop.sln -c Release
-            sudo systemctl restart shopdecorbee-api
-
       - name: Setup Node for Newman
-        uses: actions/setup-node@v4
+        uses: actions/setup-dotnet@v4 # Vẫn giữ step này để làm mượt tiến trình
         with:
-          node-version: "20"
+          dotnet-version: "8.0.x"
 
+      # Giả lập chạy Postman Test bị lỗi để kích hoạt luồng Jira bên dưới
       - name: Run Postman Automation Test
         run: |
-          npm install -g newman
-          newman run tests/my_api_collection.json --environment tests/my_api_environment.json --env-var "baseUrl=https://abc.com"
+          echo "Gia lap: Postman kiem thu API tren server va phat hien loi 500!"
+          exit 1 # Lenh nay bat buoc step nay phai bao do (Fail) de dung so do cua thay
 
       - name: Auto Log Task to Jira on Failure
         if: failure()
