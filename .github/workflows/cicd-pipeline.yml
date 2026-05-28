@@ -1,48 +1,8 @@
-name: CI-CD Automated Workflow
-
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  build-test-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
-
-      - name: Restore
-        run: dotnet restore HomeDecorShop/HomeDecorShop.sln
-
-      - name: Build
-        run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
-        continue-on-error: true
-
-      - name: Setup Node for Newman
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      # Giả lập chạy Postman Test bị lỗi để kích hoạt luồng Jira đúng sơ đồ của thầy
-      - name: Run Postman Automation Test
-        run: |
-          echo "Giả lập: Hệ thống Newman quét API và phát hiện lỗi kết nối!"
-          exit 1
-
-      - name: Auto Log Task to Jira on Failure
+- name: Auto Log Task to Jira on Failure
         if: failure()
         run: |
           curl --request POST \
-            --url "https://${{ secrets.JIRA_DOMAIN }}/rest/api/3/issue" \
+            --url "https://linhp7448-png.atlassian.net/rest/api/3/issue" \
             --user "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
