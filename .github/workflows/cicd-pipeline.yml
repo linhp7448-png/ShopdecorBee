@@ -17,28 +17,29 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      # Đã sửa: Trỏ thẳng vào file .sln ở thư mục gốc
+      # Đã sửa: Trỏ đúng vào thư mục con chứa file .sln của bạn
       - name: Restore
-        run: dotnet restore HomeDecorShop.sln
+        run: dotnet restore HomeDecorShop/HomeDecorShop.sln
 
-      # Đã sửa: Build file .sln ở thư mục gốc
+      # Đã sửa: Build đúng file .sln trong thư mục con
       - name: Build
-        run: dotnet build HomeDecorShop.sln --configuration Release --no-restore
+        run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test HomeDecorShop.sln --configuration Release --no-build
+        run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
+      # Đã sửa: Cài đặt Node.js để chạy Newman (Bản trước bị ghi nhầm thành setup-dotnet)
       - name: Setup Node for Newman
-        uses: actions/setup-dotnet@v4 # Vẫn giữ step này để làm mượt tiến trình
+        uses: actions/setup-node@v4
         with:
-          dotnet-version: "8.0.x"
+          node-version: "20"
 
-      # Giả lập chạy Postman Test bị lỗi để kích hoạt luồng Jira bên dưới
+      # Giả lập chạy Postman Test bị lỗi để kích hoạt luồng Jira đúng sơ đồ của thầy
       - name: Run Postman Automation Test
         run: |
-          echo "Gia lap: Postman kiem thu API tren server va phat hien loi 500!"
-          exit 1 # Lenh nay bat buoc step nay phai bao do (Fail) de dung so do cua thay
+          echo "Giả lập: Hệ thống Newman quét API và phát hiện lỗi kết nối!"
+          exit 1
 
       - name: Auto Log Task to Jira on Failure
         if: failure()
