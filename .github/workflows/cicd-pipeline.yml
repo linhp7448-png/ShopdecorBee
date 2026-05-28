@@ -1,0 +1,82 @@
+name: CI-CD Automated Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore HomeDecorShop/HomeDecorShop.sln
+
+      - name: Build
+        run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
+
+      # Nếu có unit test thì bật
+      - name: Test
+        run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
+        continue-on-error: true
+
+      # Deploy demo qua SSH
+      - name: Deploy to Backend Server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /var/www/shopdecorbee
+            git pull origin main
+            dotnet restore HomeDecorShop/HomeDecorShop.sln
+            dotnet build HomeDecorShop/HomeDecorShop.sln -c Release
+            sudo systemctl restart shopdecorbee-api
+
+      - name: Setup Node for Newman
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run Postman Automation Test
+        run: |
+          npm install -g newman
+          newman run tests/my_api_collection.json --environment tests/my_api_environment.json --env-var "baseUrl=https://abc.com"
+
+      - name: Auto Log Task to Jira on Failure
+        if: failure()
+        run: |
+          curl --request POST \
+            --url "https://${{ secrets.JIRA_DOMAIN }}/rest/api/3/issue" \
+            --user "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --data '{
+              "fields": {
+                "project": { "key": "${{ secrets.JIRA_PROJECT_KEY }}" },
+                "summary": "Auto-Bug: Postman test failed after deploy",
+                "description": {
+                  "type": "doc",
+                  "version": 1,
+                  "content": [
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        { "type": "text", "text": "Pipeline failed at Postman/Newman step. Please check API logs." }
+                      ]
+                    }
+                  ]
+                },
+                "issuetype": { "name": "Bug" },
+                "assignee": { "id": "${{ secrets.JIRA_ASSIGNEE_ID }}" }
+              }
+            }'
