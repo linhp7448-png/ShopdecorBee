@@ -919,9 +919,9 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=processing",
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}/status?status=processing",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "path": ["api", "admin", "orders", "{{orderId}}", "status"],
               "query": [{ "key": "status", "value": "processing" }]
             },
             "description": "Status hop le: pending_payment, processing, cancelled, completed, refund_requested, refunded"
