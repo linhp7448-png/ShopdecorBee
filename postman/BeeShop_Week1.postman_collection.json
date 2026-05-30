@@ -56,10 +56,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const existing = pm.environment.get('customerEmail');",
-                  "if (!existing) {",
-                  "  pm.environment.set('customerEmail', `customer_${Date.now()}@example.com`);",
-                  "}"
+                  "pm.environment.set('customerEmail', `customer_${Date.now()}@example.com`);"
                 ]
               }
             },
