@@ -53,16 +53,42 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG
+      # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG (Có xuất file report JSON)
       # Sử dụng continue-on-error: true để GitHub luôn giữ màu Xanh 🟢 khi báo cáo đồ án
       - name: Run Postman Automation Test
         id: newman_test
         run: |
           echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ 56 API..."
-          newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
+          newman run postman/ShopdecorBee-7-Services.postman_collection.json \
+            --env-var "baseUrl=http://localhost:5000" \
+            -r json --reporter-json-export report.json
         continue-on-error: true
+
+      # 🔍 ĐỌC FILE REPORT ĐỂ TRÍCH XUẤT TÊN SERVICE BỊ LỖI
+      - name: Extract Failed Service Name
+        id: get_failed_service
+        if: steps.newman_test.outcome == 'failure' && always()
+        run: |
+          # Dùng Node.js (có sẵn trên Runner) để lọc ra tên của Request đầu tiên bị gãy trong file report.json
+          FAILED_SERVICE=$(node -e "
+            try {
+              const report = require('./report.json');
+              const failures = report.run.failures;
+              if (failures && failures.length > 0) {
+                // Lấy tên của Request bị lỗi (Ví dụ: 'Service 1: Get Product Detail')
+                console.log(failures[0].source.name);
+              } else {
+                console.log('Unknown Service');
+              }
+            } catch(e) {
+              console.log('Error parsing report');
+            }
+          ")
+          echo "Tên Service bị lỗi tìm được: $FAILED_SERVICE"
+          # Lưu tên Service này vào biến môi trường của GitHub Actions để bước dưới sử dụng
+          echo "FAILED_API=$FAILED_SERVICE" >> $GITHUB_ENV
           
-      # Gửi thông báo lỗi tự động lên Jira CHỈ KHI Newman thực sự thất bại hệ thống ngầm
+      # 🚀 TỰ ĐỘNG BẮN LỖI SANG JIRA KÈM TÊN SERVICE BỊ TOANG
       - name: Auto Log Task to Jira on Failure
         if: steps.newman_test.outcome == 'failure' && always()
         run: |
@@ -82,20 +108,28 @@ jobs:
                     {
                       "type": "paragraph",
                       "content": [
-                        { "type": "text", "text": "Pipeline failed at Postman/Newman step. Please check API logs. CC members: " },
-                        { "type": "mention", "attrs": { "id": "712020:9e92ab8c-650e-4b0f-8789-8f433994d39d", "text": "@Người 1" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:4de74e01-956d-46b4-b53b-1bd7cddbbbf1", "text": "@Người 2" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:67fb1578-f2a4-4442-99c8-4bb7cdc5320e", "text": "@Người 3" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:9c25dcd2-075c-4b9d-a0c6-b036f52fe668", "text": "@Người 4" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:d70dcacb-faeb-45d5-8fb1-36e228060915", "text": "@Người 5" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:0bcf58a4-243d-428c-b5ce-a70c9867de65", "text": "@Người 6" } },
-                        { "type": "text", "text": " " },
-                        { "type": "mention", "attrs": { "id": "712020:2100b439-5cb7-494f-bb89-b02ef8d8cb1e", "text": "@Người 7" } }
+                        { "type": "text", "text": "🚨 " },
+                        { "type": "text", "text": "HỆ THỐNG PHÁT HIỆN LỖI API TỰ ĐỘNG", "marks": [{ "type": "strong" }] }
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        { "type": "text", "text": "Cảnh báo: Tiến trình CI/CD phát hiện API sau đây kiểm thử bị THẤT BẠI: " }
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        { "type": "text", "text": "👉 Thành phần lỗi: " },
+                        { "type": "text", "text": "${{ env.FAILED_API }}", "marks": [{ "type": "strong" }] }
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "content": [
+                        { "type": "text", "text": "Vui lòng kiểm tra lại log hệ thống. CC: " },
+                        { "type": "mention", "attrs": { "id": "712020:9e92ab8c-650e-4b0f-8789-8f433994d39d", "text": "@Người 1" } }
                       ]
                     }
                   ]
