@@ -23,16 +23,16 @@ jobs:
       - name: Build
         run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
 
-      - name: Test
+      - name: Test (.NET Unit/Integration Test)
         run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
-      # BƯỚC MỚI: Khởi chạy Server Backend .NET chạy ngầm trên port 5000
+      # 🚀 KHỞI CHẠY SERVER API THẬT CHẠY NGẦM
       - name: Start .NET Web API Server
         run: |
-          dotnet run --project HomeDecorShop/HomeDecorShop/HomeDecorShop.csproj --urls "http://localhost:5000" &
-          echo "Đang khởi động Server .NET..."
-          sleep 10 # Chờ 10 giây để server kịp lên nguồn ổn định
+          dotnet run --project HomeDecorShop/HomeDecorShop.API/HomeDecorShop.API.csproj --configuration Release --urls "http://localhost:5000" &
+          echo "Đang khởi động Server .NET API tại cổng 5000..."
+          sleep 12 # Chờ 12 giây để hệ thống Entity Framework/Database khởi tạo xong hoàn toàn
 
       - name: Setup Node for Newman
         uses: actions/setup-node@v4
@@ -42,12 +42,13 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      # ĐÃ SỬA: Chạy file thật và truyền chính xác URL của Server đang chạy ngầm vào baseUrl
+      # 🎯 CHẠY FILE POSTMAN THẬT ĐỐI CHIẾU VỚI SERVER ĐANG HOẠT ĐỘNG
       - name: Run Postman Automation Test
         run: |
-          echo "Hệ thống Newman bắt đầu quét và kiểm thử API thật..."
+          echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ 56 API..."
           newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
           
+      # Luồng tự động báo lỗi sang Jira kết nối trực tiếp khi kiểm thử thất bại
       - name: Auto Log Task to Jira on Failure
         if: failure()
         run: |
