@@ -536,9 +536,9 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=processing",
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=processing",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
               "query": [{ "key": "status", "value": "processing" }]
             }
           }
@@ -567,9 +567,9 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=completed",
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=completed",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
               "query": [{ "key": "status", "value": "completed" }]
             }
           }
@@ -597,9 +597,9 @@
             "method": "PATCH",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/status?status=processing",
+              "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=processing",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "status"],
+              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
               "query": [{ "key": "status", "value": "processing" }]
             }
           }
