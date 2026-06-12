@@ -27,6 +27,13 @@ jobs:
         run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
+      # BƯỚC MỚI: Khởi chạy Server Backend .NET chạy ngầm trên port 5000
+      - name: Start .NET Web API Server
+        run: |
+          dotnet run --project HomeDecorShop/HomeDecorShop/HomeDecorShop.csproj --urls "http://localhost:5000" &
+          echo "Đang khởi động Server .NET..."
+          sleep 10 # Chờ 10 giây để server kịp lên nguồn ổn định
+
       - name: Setup Node for Newman
         uses: actions/setup-node@v4
         with:
@@ -35,11 +42,11 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      # ĐÃ SỬA: Trỏ chuẩn vào thư mục postman/ để không còn bị lỗi ENOENT nữa
+      # ĐÃ SỬA: Chạy file thật và truyền chính xác URL của Server đang chạy ngầm vào baseUrl
       - name: Run Postman Automation Test
         run: |
-          echo "Hệ thống Newman bắt đầu chạy test suite cho ShopdecorBee..."
-          newman run postman/ShopdecorBee-7-Services.postman_collection.json
+          echo "Hệ thống Newman bắt đầu quét và kiểm thử API thật..."
+          newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
           
       - name: Auto Log Task to Jira on Failure
         if: failure()
