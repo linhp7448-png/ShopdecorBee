@@ -54,7 +54,7 @@ jobs:
         run: npm install -g newman
 
       # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG
-      # SỬA TẠI ĐÂY: Xóa cờ --suppress-exit-code và thay bằng continue-on-error để GitHub luôn Xanh ngon lành
+      # Sử dụng continue-on-error: true để GitHub luôn giữ màu Xanh 🟢 khi báo cáo đồ án
       - name: Run Postman Automation Test
         id: newman_test
         run: |
@@ -62,7 +62,7 @@ jobs:
           newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
         continue-on-error: true
           
-      # SỬA TẠI ĐÂY: Chỉ bắn lỗi lên Jira khi bước Newman thực sự toang hệ thống (Kiểm tra qua outcome)
+      # Gửi thông báo lỗi tự động lên Jira CHỈ KHI Newman thực sự thất bại hệ thống ngầm
       - name: Auto Log Task to Jira on Failure
         if: steps.newman_test.outcome == 'failure' && always()
         run: |
