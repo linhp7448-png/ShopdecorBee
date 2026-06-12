@@ -78,7 +78,7 @@ jobs:
                     }
                   ]
                 },
-                "issuetype": { "name": "Bug" },
+                "issuetype": { "name": "Task" },
                 "assignee": { "id": "${{ secrets.JIRA_ASSIGNEE_ID }}" }
               }
             }'
