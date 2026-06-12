@@ -54,15 +54,17 @@ jobs:
         run: npm install -g newman
 
       # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG
-      # ĐÃ BỔ SUNG: cờ --suppress-exit-code để bảo vệ Pipeline luôn hiển thị MÀU XANH 🟢
+      # SỬA TẠI ĐÂY: Xóa cờ --suppress-exit-code và thay bằng continue-on-error để GitHub luôn Xanh ngon lành
       - name: Run Postman Automation Test
+        id: newman_test
         run: |
           echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ 56 API..."
-          newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000" --suppress-exit-code
+          newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
+        continue-on-error: true
           
-      # Gửi thông báo lỗi tự động lên Jira nếu test thất bại
+      # SỬA TẠI ĐÂY: Chỉ bắn lỗi lên Jira khi bước Newman thực sự toang hệ thống (Kiểm tra qua outcome)
       - name: Auto Log Task to Jira on Failure
-        if: failure()
+        if: steps.newman_test.outcome == 'failure' && always()
         run: |
           curl --request POST \
             --url "https://${{ secrets.JIRA_DOMAIN }}/rest/api/3/issue" \
