@@ -17,9 +17,11 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      # Đã sửa: Trỏ đúng vào thư mục con chứa file .sln của bạn
       - name: Restore
         run: dotnet restore HomeDecorShop/HomeDecorShop.sln
 
+      # Đã sửa: Build đúng file .sln trong thư mục con
       - name: Build
         run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
 
@@ -27,6 +29,7 @@ jobs:
         run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
+      # Đã sửa: Cài đặt Node.js để chạy Newman (Bản trước bị ghi nhầm thành setup-dotnet)
       - name: Setup Node for Newman
         uses: actions/setup-node@v4
         with:
@@ -42,13 +45,13 @@ jobs:
         if: failure()
         run: |
           curl --request POST \
-            --url "https://linhp7448.atlassian.net/rest/api/3/issue" \
+            --url "https://${{ secrets.JIRA_DOMAIN }}/rest/api/3/issue" \
             --user "${{ secrets.JIRA_EMAIL }}:${{ secrets.JIRA_API_TOKEN }}" \
             --header "Accept: application/json" \
             --header "Content-Type: application/json" \
             --data '{
               "fields": {
-                "project": { "key": "KCPM" },
+                "project": { "key": "${{ secrets.JIRA_PROJECT_KEY }}" },
                 "summary": "Auto-Bug: Postman test failed after deploy",
                 "description": {
                   "type": "doc",
@@ -57,11 +60,25 @@ jobs:
                     {
                       "type": "paragraph",
                       "content": [
-                        { "type": "text", "text": "Pipeline failed at Postman/Newman step. Please check API logs." }
+                        { "type": "text", "text": "Pipeline failed at Postman/Newman step. Please check API logs. CC members: " },
+                        { "type": "mention", "attrs": { "id": "712020:9e92ab8c-650e-4b0f-8789-8f433994d39d", "text": "@Người 1" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:4de74e01-956d-46b4-b53b-1bd7cddbbbf1", "text": "@Người 2" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:67fb1578-f2a4-4442-99c8-4bb7cdc5320e", "text": "@Người 3" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:9c25dcd2-075c-4b9d-a0c6-b036f52fe668", "text": "@Người 4" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:d70dcacb-faeb-45d5-8fb1-36e228060915", "text": "@Người 5" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:0bcf58a4-243d-428c-b5ce-a70c9867de65", "text": "@Người 6" } },
+                        { "type": "text", "text": " " },
+                        { "type": "mention", "attrs": { "id": "712020:2100b439-5cb7-494f-bb89-b02ef8d8cb1e", "text": "@Người 7" } }
                       ]
                     }
                   ]
                 },
-                "issuetype": { "name": "Task" }
+                "issuetype": { "name": "Bug" },
+                "assignee": { "id": "${{ secrets.JIRA_ASSIGNEE_ID }}" }
               }
             }'
