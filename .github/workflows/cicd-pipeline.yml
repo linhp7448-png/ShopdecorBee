@@ -32,17 +32,15 @@ jobs:
         with:
           node-version: "20"
 
-      # Cài đặt Newman để có thể đọc và chạy file JSON của Postman
       - name: Install Newman
         run: npm install -g newman
 
-      # ĐÃ CẬP NHẬT: Chạy test tự động với file collection thật của bạn
+      # ĐÃ SỬA: Trỏ chuẩn vào thư mục postman/ để không còn bị lỗi ENOENT nữa
       - name: Run Postman Automation Test
         run: |
           echo "Hệ thống Newman bắt đầu chạy test suite cho ShopdecorBee..."
-          newman run ShopdecorBee-7-Services.postman_collection.json
+          newman run postman/ShopdecorBee-7-Services.postman_collection.json
           
-      # Bước Jira giữ nguyên, chỉ kích hoạt khi test thật bị fail (if: failure)
       - name: Auto Log Task to Jira on Failure
         if: failure()
         run: |
