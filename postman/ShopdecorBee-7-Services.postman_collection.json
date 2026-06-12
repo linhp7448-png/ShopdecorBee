@@ -1,288 +1,468 @@
 {
   "info": {
-    "_postman_id": "shopdecorbee-7-services",
+    "_postman_id": "fe91f7d6-1a8b-49d9-8e35-649d7772049c",
     "name": "ShopdecorBee - 7 Services",
     "description": "API test collection cho 7 service chinh: Auth, Category, Product, Cart, Order, Payment, Wallet.\n\nThu tu chay: 00 Setup -> 01 Auth -> 02 Category -> 03 Product -> 04 Cart -> 05 Order -> 06 Payment / 07 Wallet.\n\nImport kem file ShopdecorBee.postman_environment.json va chon environment truoc khi chay.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{customerToken}}",
-        "type": "string"
-      }
-    ]
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "51323503"
   },
   "item": [
     {
       "name": "00 - Setup",
       "item": [
         {
+          "name": "01 - Auth & User Service",
+          "item": [
+            {
+              "name": "Register Customer",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    pm.environment.set('customerToken', pm.response.json().token);",
+                      "}",
+                      "pm.test('200 hoac 409 (email da ton tai)', () => {",
+                      "    pm.expect([200, 409]).to.include(pm.response.code);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"fullName\": \"Nguyen Van Test\",\n  \"phone\": \"0901234567\",\n  \"password\": \"{{customerPassword}}\",\n  \"role\": \"customer\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login Customer",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "if (pm.response.code === 200) {",
+                      "    pm.environment.set('customerToken', pm.response.json().token);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login Admin",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "if (pm.response.code === 200) {",
+                      "    pm.environment.set('adminToken', pm.response.json().token);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Profile",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Co email', () => pm.expect(pm.response.json().email).to.be.a('string'));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/account/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "account",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Profile",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\": \"Nguyen Van Updated\",\n  \"phone\": \"0909999888\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/account/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "account",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login Wrong Password (negative)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"SaiMatKhau123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Profile No Token (negative)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 401', () => pm.response.to.have.status(401));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/account/profile",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "account",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Register Duplicate Email (negative)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status 409', () => pm.response.to.have.status(409));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"fullName\": \"Trung Email\",\n  \"phone\": \"0901111222\",\n  \"password\": \"{{customerPassword}}\",\n  \"role\": \"customer\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "Task Jira: Postman - Auth & User Service"
+        },
+        {
           "name": "Seed All Demo Data",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/Maintenance/seed/all",
-            "description": "Chay 1 lan neu DB trong. Tao admin, categories, products."
-          },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "",
                   "const data = pm.response.json();",
-                  "pm.test('Co san pham', () => pm.expect(data.totalProducts).to.be.above(0));"
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (data && data.token) {",
+                  "    pm.environment.set(\"token\", data.token);",
+                  "}"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/Maintenance/seed/all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Maintenance",
+                "seed",
+                "all"
+              ]
+            },
+            "description": "Chay 1 lan neu DB trong. Tao admin, categories, products."
+          },
+          "response": []
         },
         {
           "name": "Seed System Only (admin + settings)",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/Maintenance/seed/system"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/Maintenance/seed/system",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Maintenance",
+                "seed",
+                "system"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Seed Categories Only",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/Maintenance/seed/categories"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/Maintenance/seed/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Maintenance",
+                "seed",
+                "categories"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Seed Products Only",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/Maintenance/seed/products"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/Maintenance/seed/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "Maintenance",
+                "seed",
+                "products"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "description": "Buoc 0: chay truoc khi test neu DB chua co du lieu."
-    },
-    {
-      "name": "01 - Auth & User Service",
-      "item": [
-        {
-          "name": "Register Customer",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"fullName\": \"Nguyen Van Test\",\n  \"phone\": \"0901234567\",\n  \"password\": \"{{customerPassword}}\",\n  \"role\": \"customer\"\n}"
-            },
-            "url": "{{baseUrl}}/api/auth/register"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "if (pm.response.code === 200) {",
-                  "    pm.environment.set('customerToken', pm.response.json().token);",
-                  "}",
-                  "pm.test('200 hoac 409 (email da ton tai)', () => {",
-                  "    pm.expect([200, 409]).to.include(pm.response.code);",
-                  "});"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Login Customer",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}"
-            },
-            "url": "{{baseUrl}}/api/auth/login"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "if (pm.response.code === 200) {",
-                  "    pm.environment.set('customerToken', pm.response.json().token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Login Admin",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
-            },
-            "url": "{{baseUrl}}/api/auth/login"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "if (pm.response.code === 200) {",
-                  "    pm.environment.set('adminToken', pm.response.json().token);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/account/profile"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Co email', () => pm.expect(pm.response.json().email).to.be.a('string'));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Update Profile",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nguyen Van Updated\",\n  \"phone\": \"0909999888\"\n}"
-            },
-            "url": "{{baseUrl}}/api/account/profile"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Login Wrong Password (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"SaiMatKhau123!\"\n}"
-            },
-            "url": "{{baseUrl}}/api/auth/login"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Get Profile No Token (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/account/profile"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 401', () => pm.response.to.have.status(401));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        },
-        {
-          "name": "Register Duplicate Email (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"fullName\": \"Trung Email\",\n  \"phone\": \"0901111222\",\n  \"password\": \"{{customerPassword}}\",\n  \"role\": \"customer\"\n}"
-            },
-            "url": "{{baseUrl}}/api/auth/register"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 409', () => pm.response.to.have.status(409));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
-        }
-      ],
-      "description": "Task Jira: Postman - Auth & User Service"
     },
     {
       "name": "02 - Category Service",
       "item": [
         {
           "name": "List Categories",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/categories"
-          },
           "event": [
             {
               "listen": "test",
@@ -302,16 +482,28 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Category By Id",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/categories/{{categoryId}}"
-          },
           "event": [
             {
               "listen": "test",
@@ -326,25 +518,29 @@
                 "type": "text/javascript"
               }
             }
-          ]
-        },
-        {
-          "name": "Products By Category Slug",
+          ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/products?category={{categorySlug}}&page=1&pageSize=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "products"],
-              "query": [
-                { "key": "category", "value": "{{categorySlug}}" },
-                { "key": "page", "value": "1" },
-                { "key": "pageSize", "value": "10" }
+              "raw": "{{baseUrl}}/api/categories/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "{{categoryId}}"
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Products By Category Slug",
           "event": [
             {
               "listen": "test",
@@ -355,16 +551,42 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?category={{categorySlug}}&page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "{{categorySlug}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Category Not Found (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/categories/999999"
-          },
           "event": [
             {
               "listen": "test",
@@ -375,23 +597,29 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/categories/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "999999"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Admin Create Category",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
-            },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Danh muc Postman Test\",\n  \"slug\": \"danh-muc-postman-test-{{$timestamp}}\",\n  \"groupId\": {{groupId}},\n  \"isActive\": true\n}"
-            },
-            "url": "{{baseUrl}}/api/categories"
-          },
           "event": [
             {
               "listen": "test",
@@ -402,7 +630,41 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Danh muc Postman Test\",\n  \"slug\": \"danh-muc-postman-test-{{$timestamp}}\",\n  \"groupId\": {{groupId}},\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "description": "Chay TRUOC Product de co categorySlug."
@@ -412,44 +674,68 @@
       "item": [
         {
           "name": "List Products",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/products?page=1&pageSize=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "products"],
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "pageSize", "value": "10" }
-              ]
-            }
-          },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
+                  "",
                   "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "",
                   "const data = pm.response.json();",
-                  "if (data.items && data.items.length > 0) {",
-                  "    pm.environment.set('productId', data.items[0].productId);",
+                  "",
+                  "if (data && data.items && data.items.length > 0) {",
+                  "    const firstProduct = data.items[0];",
+                  "",
+                  "    const idToSet = firstProduct.id || firstProduct.productId;",
+                  "    ",
+                  "    if (idToSet) {",
+                  "        pm.environment.set('productId', idToSet);",
+                  "        console.log(\"Đã bắt được Product ID thực tế:\", idToSet);",
+                  "    }",
+                  "",
+                  "    if (firstProduct.slug) {",
+                  "        pm.environment.set('productSlug', firstProduct.slug);",
+                  "    }",
                   "}"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Product Detail",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/products/{{productId}}"
-          },
           "event": [
             {
               "listen": "test",
@@ -460,66 +746,126 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "{{productId}}"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Search Products",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/products?q=sofa&page=1&pageSize=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "products"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
               "query": [
-                { "key": "q", "value": "sofa" },
-                { "key": "page", "value": "1" },
-                { "key": "pageSize", "value": "10" }
+                {
+                  "key": "q",
+                  "value": "sofa"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Filter By Price + InStock",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/products?minPrice=100000&maxPrice=10000000&inStock=true",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "products"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
               "query": [
-                { "key": "minPrice", "value": "100000" },
-                { "key": "maxPrice", "value": "10000000" },
-                { "key": "inStock", "value": "true" }
+                {
+                  "key": "minPrice",
+                  "value": "100000"
+                },
+                {
+                  "key": "maxPrice",
+                  "value": "10000000"
+                },
+                {
+                  "key": "inStock",
+                  "value": "true"
+                }
               ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Filter By Category Slug",
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/products?category={{categorySlug}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "products"],
-              "query": [{ "key": "category", "value": "{{categorySlug}}" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "{{categorySlug}}"
+                }
+              ]
             }
-          }
+          },
+          "response": []
         },
         {
           "name": "Product Not Found (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/products/999999"
-          },
           "event": [
             {
               "listen": "test",
@@ -530,23 +876,29 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "999999"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Admin Create Product",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
-            },
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sku\": \"PM-SKU-{{$timestamp}}\",\n  \"name\": \"San pham Postman Test\",\n  \"slug\": \"san-pham-postman-{{$timestamp}}\",\n  \"price\": 1500000,\n  \"originalPrice\": 2000000,\n  \"categoryId\": {{categoryId}},\n  \"category\": \"{{categoryName}}\",\n  \"image\": \"/images/test.jpg\",\n  \"hoverImage\": \"/images/test-hover.jpg\",\n  \"brand\": \"BeeShop\",\n  \"color\": \"Trang\",\n  \"material\": \"Go\",\n  \"style\": \"Modern\",\n  \"stockLeft\": 10,\n  \"rating\": 0,\n  \"reviews\": 0,\n  \"isActive\": true\n}"
-            },
-            "url": "{{baseUrl}}/api/products"
-          },
           "event": [
             {
               "listen": "test",
@@ -560,7 +912,41 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PM-SKU-{{$timestamp}}\",\n  \"name\": \"San pham Postman Test\",\n  \"slug\": \"san-pham-postman-{{$timestamp}}\",\n  \"price\": 1500000,\n  \"originalPrice\": 2000000,\n  \"categoryId\": {{categoryId}},\n  \"category\": \"{{categoryName}}\",\n  \"image\": \"/images/test.jpg\",\n  \"hoverImage\": \"/images/test-hover.jpg\",\n  \"brand\": \"BeeShop\",\n  \"color\": \"Trang\",\n  \"material\": \"Go\",\n  \"style\": \"Modern\",\n  \"stockLeft\": 10,\n  \"rating\": 0,\n  \"reviews\": 0,\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -569,11 +955,6 @@
       "item": [
         {
           "name": "Get Cart",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/cart"
-          },
           "event": [
             {
               "listen": "test",
@@ -584,19 +965,25 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Add Item To Cart",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
-            },
-            "url": "{{baseUrl}}/api/cart/items"
-          },
           "event": [
             {
               "listen": "test",
@@ -611,19 +998,35 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Update Item Quantity",
-          "request": {
-            "method": "PUT",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"quantity\": 2\n}"
-            },
-            "url": "{{baseUrl}}/api/cart/items/{{cartItemId}}"
-          },
           "event": [
             {
               "listen": "test",
@@ -634,15 +1037,36 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/{{cartItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items",
+                "{{cartItemId}}"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Remove Item",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": "{{baseUrl}}/api/cart/items/{{cartItemId}}"
-          },
           "event": [
             {
               "listen": "test",
@@ -653,28 +1077,56 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/{{cartItemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items",
+                "{{cartItemId}}"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Add Item Again + Clear Cart",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
             },
-            "url": "{{baseUrl}}/api/cart/items",
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            },
             "description": "Sau request nay, chay DELETE /api/cart/items de clear."
-          }
+          },
+          "response": []
         },
         {
           "name": "Clear Cart",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": "{{baseUrl}}/api/cart/items"
-          },
           "event": [
             {
               "listen": "test",
@@ -685,16 +1137,26 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Cart No Token (negative)",
-          "request": {
-            "auth": { "type": "noauth" },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/cart"
-          },
           "event": [
             {
               "listen": "test",
@@ -705,20 +1167,28 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Prepare Cart For Order",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
-            },
-            "url": "{{baseUrl}}/api/cart/items",
-            "description": "Chay truoc khi tao don hang."
-          },
           "event": [
             {
               "listen": "test",
@@ -729,7 +1199,33 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            },
+            "description": "Chay truoc khi tao don hang."
+          },
+          "response": []
         }
       ]
     },
@@ -738,16 +1234,6 @@
       "item": [
         {
           "name": "Create Order (for Payment COD)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nguyen Van A\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don hang test Payment COD\"\n}"
-            },
-            "url": "{{baseUrl}}/api/orders",
-            "description": "Chay Prepare Cart For Order truoc."
-          },
           "event": [
             {
               "listen": "test",
@@ -763,47 +1249,100 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van A\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don hang test Payment COD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            },
+            "description": "Chay Prepare Cart For Order truoc."
+          },
+          "response": []
         },
         {
           "name": "List My Orders",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/orders"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Order By Id",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderId}}"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Prepare Cart For Wallet Order",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
             },
-            "url": "{{baseUrl}}/api/cart/items"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Create Order (for Wallet Pay)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nguyen Van A\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don hang test Wallet Pay\"\n}"
-            },
-            "url": "{{baseUrl}}/api/orders"
-          },
           "event": [
             {
               "listen": "test",
@@ -817,32 +1356,63 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van A\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don hang test Wallet Pay\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Prepare Cart + Create Order (for Cancel)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
             },
-            "url": "{{baseUrl}}/api/cart/items",
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart",
+                "items"
+              ]
+            },
             "description": "Buoc 1: add cart. Buoc 2: chay Cancel Order Create ben duoi."
-          }
+          },
+          "response": []
         },
         {
           "name": "Create Order (for Cancel test)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Nguyen Van Cancel\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don de huy\"\n}"
-            },
-            "url": "{{baseUrl}}/api/orders"
-          },
           "event": [
             {
               "listen": "prerequest",
@@ -864,39 +1434,66 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyen Van Cancel\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"Don de huy\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Cancel Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
-            "url": "{{baseUrl}}/api/orders/{{orderId}}/cancel",
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderId}}",
+                "cancel"
+              ]
+            },
             "description": "Don phai pending_payment, chua thanh toan."
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Admin List All Orders",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
-            },
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/admin/orders"
-          },
           "event": [
             {
               "listen": "test",
@@ -907,25 +1504,71 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Admin Update Order Status",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{orderId}}/status?status=processing",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderId}}", "status"],
-              "query": [{ "key": "status", "value": "processing" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{orderId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "processing"
+                }
+              ]
             },
             "description": "Status hop le: pending_payment, processing, cancelled, completed, refund_requested, refunded"
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -934,15 +1577,6 @@
       "item": [
         {
           "name": "Process Payment COD",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": {{orderIdForPayment}},\n  \"method\": \"cod\"\n}"
-            },
-            "url": "{{baseUrl}}/api/payments"
-          },
           "event": [
             {
               "listen": "test",
@@ -956,49 +1590,100 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderIdForPayment}},\n  \"method\": \"cod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "List My Payments",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/payments"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Get Payments By Order",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/payments/order/{{orderIdForPayment}}"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/order/{{orderIdForPayment}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments",
+                "order",
+                "{{orderIdForPayment}}"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Process Payment Momo",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"orderId\": {{orderIdForPayment}},\n  \"method\": \"momo\"\n}"
             },
-            "url": "{{baseUrl}}/api/payments",
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payments"
+              ]
+            },
             "description": "Neu don da paid se 409. Can don pending_payment moi."
-          }
+          },
+          "response": []
         },
         {
           "name": "Request Refund",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"reason\": \"San pham bi loi - test Postman\"\n}"
-            },
-            "url": "{{baseUrl}}/api/orders/{{orderIdForPayment}}/request-refund",
-            "description": "Don phai da thanh toan."
-          },
           "event": [
             {
               "listen": "test",
@@ -1009,24 +1694,71 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"San pham bi loi - test Postman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/{{orderIdForPayment}}/request-refund",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "{{orderIdForPayment}}",
+                "request-refund"
+              ]
+            },
+            "description": "Don phai da thanh toan."
+          },
+          "response": []
         },
         {
           "name": "Admin Approve Refund",
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{orderIdForPayment}}/process-refund?approve=true",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderIdForPayment}}", "process-refund"],
-              "query": [{ "key": "approve", "value": "true" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{orderIdForPayment}}",
+                "process-refund"
+              ],
+              "query": [
+                {
+                  "key": "approve",
+                  "value": "true"
+                }
+              ]
             }
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -1035,11 +1767,6 @@
       "item": [
         {
           "name": "Get Wallet",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/wallet"
-          },
           "event": [
             {
               "listen": "test",
@@ -1050,28 +1777,44 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "List Transactions",
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/api/wallet/transactions"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "transactions"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Deposit (test direct)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 5000000\n}"
-            },
-            "url": "{{baseUrl}}/api/wallet/deposit",
-            "description": "Nap tien truc tiep (endpoint test). Chay TRUOC Wallet Pay Order."
-          },
           "event": [
             {
               "listen": "test",
@@ -1082,31 +1825,64 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/deposit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "deposit"
+              ]
+            },
+            "description": "Nap tien truc tiep (endpoint test). Chay TRUOC Wallet Pay Order."
+          },
+          "response": []
         },
         {
           "name": "Withdraw",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"amount\": 100000\n}"
             },
-            "url": "{{baseUrl}}/api/wallet/withdraw"
-          }
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/withdraw",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "withdraw"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Withdraw Insufficient (negative)",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 999999999999\n}"
-            },
-            "url": "{{baseUrl}}/api/wallet/withdraw"
-          },
           "event": [
             {
               "listen": "test",
@@ -1119,20 +1895,35 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 999999999999\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/withdraw",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "withdraw"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Pay Order With Wallet",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"orderId\": {{orderIdForWallet}}\n}"
-            },
-            "url": "{{baseUrl}}/api/wallet/pay",
-            "description": "Can: deposit du tien + order pending_payment (orderIdForWallet)."
-          },
           "event": [
             {
               "listen": "test",
@@ -1143,20 +1934,64 @@
                 "type": "text/javascript"
               }
             }
-          ]
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderIdForWallet}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/pay",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "pay"
+              ]
+            },
+            "description": "Can: deposit du tien + order pending_payment (orderIdForWallet)."
+          },
+          "response": []
         },
         {
           "name": "Create VNPay Deposit URL (optional)",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"amount\": 100000\n}"
             },
-            "url": "{{baseUrl}}/api/wallet/deposit/vnpay/url",
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/deposit/vnpay/url",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "deposit",
+                "vnpay",
+                "url"
+              ]
+            },
             "description": "Can ngrok/callback. Co the Skip trong report."
-          }
+          },
+          "response": []
         }
       ]
     },
@@ -1168,11 +2003,30 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": "{{baseUrl}}/swagger",
+            "url": {
+              "raw": "{{baseUrl}}/swagger",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "swagger"
+              ]
+            },
             "description": "Khong chay request nay. Dung huong dan ben duoi de chay Runner theo thu tu folder:\n\n1. 00 - Setup (Seed All)\n2. 01 - Auth (Login Customer + Login Admin)\n3. 02 - Category (List Categories)\n4. 03 - Product (List Products)\n5. 04 - Cart (Prepare Cart For Order)\n6. 05 - Order (Create Order for Payment + Prepare/Create Wallet Order)\n7. 07 - Wallet (Deposit -> Pay Order)\n8. 06 - Payment (COD -> Refund flow)\n\nHoac chay tung folder rieng cho tung task Jira."
-          }
+          },
+          "response": []
         }
       ]
     }
-  ]
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{customerToken}}",
+        "type": "string"
+      }
+    ]
+  }
 }
