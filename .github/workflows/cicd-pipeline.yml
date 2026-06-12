@@ -17,25 +17,25 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      # 🐳 Khởi chạy một container SQL Server thật trên GitHub Actions
+      # 🐳 Khởi chạy một container SQL Server thật trên hệ thống ảo của GitHub
       - name: Start Microsoft SQL Server
         run: |
           docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Password123" \
             -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
           echo "Đang khởi tạo SQL Server Container..."
-          sleep 15 # Chờ 15 giây để SQL Server lên nguồn hoàn toàn
+          sleep 15 # Chờ 15 giây để cơ sở dữ liệu lên nguồn hoàn toàn
 
-      - name: Restore
+      - name: Restore Dependencies
         run: dotnet restore HomeDecorShop/HomeDecorShop.sln
 
-      - name: Build
+      - name: Build Solution
         run: dotnet build HomeDecorShop/HomeDecorShop.sln --configuration Release --no-restore
 
       - name: Test (.NET Unit/Integration Test)
         run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
-      # 🚀 KHỞI CHẠY SERVER API THẬT (Ép chạy ở chế độ Development để nhận DB)
+      # 🚀 KHỞI CHẠY SERVER API THẬT (Chế độ Development để tự động Migration DB)
       - name: Start .NET Web API Server
         env:
           ASPNETCORE_ENVIRONMENT: Development
@@ -43,39 +43,38 @@ jobs:
         run: |
           dotnet run --project HomeDecorShop/HomeDecorShop.API/HomeDecorShop.API.csproj --configuration Release --urls "http://localhost:5000" &
           echo "Đang khởi động Server .NET API tại cổng 5000..."
-          sleep 15 # Chờ 15 giây để EF Core thực hiện Migration/Seed data thành công
+          sleep 15 # Chờ 15 giây để Server ổn định hệ thống trước khi Newman bắn Test
 
       - name: Setup Node for Newman
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install Newman
+      - name: Install Newman CLI
         run: npm install -g newman
 
-      # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG (Có xuất file report JSON)
-      # Sử dụng continue-on-error: true để GitHub luôn giữ màu Xanh 🟢 khi báo cáo đồ án
+      # 🎯 BẮN KIỂM THỬ TỰ ĐỘNG (Xuất dữ liệu lỗi ra file report.json)
       - name: Run Postman Automation Test
         id: newman_test
         run: |
-          echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ 56 API..."
+          echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ các API..."
           newman run postman/ShopdecorBee-7-Services.postman_collection.json \
             --env-var "baseUrl=http://localhost:5000" \
             -r json --reporter-json-export report.json
         continue-on-error: true
 
       # 🔍 ĐỌC FILE REPORT ĐỂ TRÍCH XUẤT TÊN SERVICE BỊ LỖI
+      # Sửa đổi quan trọng: Thay always() thành khóa kép failure() để KIỂM SOÁT logic chặt chẽ
       - name: Extract Failed Service Name
         id: get_failed_service
-        if: steps.newman_test.outcome == 'failure' && always()
+        if: ${{ failure() && steps.newman_test.outcome == 'failure' }}
         run: |
-          # Dùng Node.js (có sẵn trên Runner) để lọc ra tên của Request đầu tiên bị gãy trong file report.json
           FAILED_SERVICE=$(node -e "
             try {
               const report = require('./report.json');
               const failures = report.run.failures;
               if (failures && failures.length > 0) {
-                // Lấy tên của Request bị lỗi (Ví dụ: 'Service 1: Get Product Detail')
+                // Nhặt chính xác tên của Request bị đổ bể đầu tiên
                 console.log(failures[0].source.name);
               } else {
                 console.log('Unknown Service');
@@ -85,12 +84,11 @@ jobs:
             }
           ")
           echo "Tên Service bị lỗi tìm được: $FAILED_SERVICE"
-          # Lưu tên Service này vào biến môi trường của GitHub Actions để bước dưới sử dụng
           echo "FAILED_API=$FAILED_SERVICE" >> $GITHUB_ENV
-          
-      # 🚀 TỰ ĐỘNG BẮN LỖI SANG JIRA KÈM TÊN SERVICE BỊ TOANG
+
+      # 🚀 TỰ ĐỘNG BẮN LỖI SANG JIRA KÈM TÊN SERVICE (Hiển thị văn bản dạng Rich-Text tinh gọn)
       - name: Auto Log Task to Jira on Failure
-        if: steps.newman_test.outcome == 'failure' && always()
+        if: ${{ failure() && steps.newman_test.outcome == 'failure' }}
         run: |
           curl --request POST \
             --url "https://${{ secrets.JIRA_DOMAIN }}/rest/api/3/issue" \
@@ -128,8 +126,7 @@ jobs:
                     {
                       "type": "paragraph",
                       "content": [
-                        { "type": "text", "text": "Vui lòng kiểm tra lại log hệ thống. CC: " },
-                        { "type": "mention", "attrs": { "id": "712020:9e92ab8c-650e-4b0f-8789-8f433994d39d", "text": "@Người 1" } }
+                        { "type": "text", "text": "Vui lòng kiểm tra lại log hệ thống ngay lập tức!" }
                       ]
                     }
                   ]
