@@ -17,6 +17,14 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      # 🐳 BƯỚC KHẮC PHỤC: Khởi chạy một container SQL Server thật trên GitHub Actions
+      - name: Start Microsoft SQL Server
+        run: |
+          docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong@Password123" \
+            -p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
+          echo "Đang khởi tạo SQL Server Container..."
+          sleep 15 # Chờ 15 giây để SQL Server lên nguồn hoàn toàn
+
       - name: Restore
         run: dotnet restore HomeDecorShop/HomeDecorShop.sln
 
@@ -27,12 +35,15 @@ jobs:
         run: dotnet test HomeDecorShop/HomeDecorShop.sln --configuration Release --no-build
         continue-on-error: true
 
-      # 🚀 KHỞI CHẠY SERVER API THẬT CHẠY NGẦM
+      # 🚀 KHỞI CHẠY SERVER API THẬT (Ép chạy ở chế độ Development để nhận DB)
       - name: Start .NET Web API Server
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=ShopdecorBeeDB;User Id=sa;Password=YourStrong@Password123;TrustServerCertificate=True;"
         run: |
           dotnet run --project HomeDecorShop/HomeDecorShop.API/HomeDecorShop.API.csproj --configuration Release --urls "http://localhost:5000" &
           echo "Đang khởi động Server .NET API tại cổng 5000..."
-          sleep 12 # Chờ 12 giây để hệ thống Entity Framework/Database khởi tạo xong hoàn toàn
+          sleep 15 # Chờ 15 giây để EF Core thực hiện Migration/Seed data thành công
 
       - name: Setup Node for Newman
         uses: actions/setup-node@v4
@@ -42,13 +53,13 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      # 🎯 CHẠY FILE POSTMAN THẬT ĐỐI CHIẾU VỚI SERVER ĐANG HOẠT ĐỘNG
+      # 🎯 BẮN TEST THẬT VÀO SERVER ĐANG HOẠT ĐỘNG
       - name: Run Postman Automation Test
         run: |
           echo "Hệ thống Newman bắt đầu thực hiện quét toàn bộ 56 API..."
           newman run postman/ShopdecorBee-7-Services.postman_collection.json --env-var "baseUrl=http://localhost:5000"
           
-      # Luồng tự động báo lỗi sang Jira kết nối trực tiếp khi kiểm thử thất bại
+      # Gửi thông báo lỗi tự động lên Jira nếu test thất bại
       - name: Auto Log Task to Jira on Failure
         if: failure()
         run: |
