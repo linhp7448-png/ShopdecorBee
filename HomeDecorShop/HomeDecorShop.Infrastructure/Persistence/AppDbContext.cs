@@ -5,9 +5,12 @@ namespace HomeDecorShop.Infrastructure;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
-    { 
-        Database.SetCommandTimeout(300); // 5 minutes
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+        if (Database.IsRelational())
+        {
+            Database.SetCommandTimeout(300); // 5 minutes
+        }
     }
 
     public DbSet<User> Users => Set<User>();
