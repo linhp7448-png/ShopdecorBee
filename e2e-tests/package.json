@@ -1,0 +1,16 @@
+{
+  "name": "shopdecorbee-e2e-tests",
+  "version": "1.0.0",
+  "description": "CodeceptJS E2E Tests for ShopdecorBee",
+  "main": "index.js",
+  "scripts": {
+    "test": "codeceptjs run --steps",
+    "test:headed": "codeceptjs run --steps",
+    "test:ui": "codecept-ui"
+  },
+  "dependencies": {
+    "codeceptjs": "^3.6.4",
+    "playwright": "^1.49.0",
+    "@codeceptjs/ui": "^1.3.8"
+  }
+}
