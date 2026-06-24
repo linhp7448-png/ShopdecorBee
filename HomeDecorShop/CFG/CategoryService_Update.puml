@@ -1,0 +1,35 @@
+@startuml CategoryService_Update
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:category = repository.GetById(categoryId);
+if (category is null?) then (yes)
+  :return null;
+  stop
+else (no)
+  :name = NormalizeName(input.Name);
+  :slug = NormalizeSlug(input.Slug);
+  
+  if (Trùng Name/Slug với Category khác HOẶC GroupId không hợp lệ?) then (yes)
+    :throw BadRequestException("Invalid data or duplicate");
+    stop
+  else (no)
+    :category.Name = name;
+    :category.Slug = slug;
+    :category.GroupId = input.GroupId;
+    :category.IsActive = input.IsActive;
+    
+    :updated = repository.Update(category);
+    if (updated is null?) then (yes)
+      :return null;
+      stop
+    else (no)
+      :return MapCategory(updated);
+      stop
+    endif
+  endif
+endif
+@enduml

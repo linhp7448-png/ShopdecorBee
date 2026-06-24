@@ -1,0 +1,15 @@
+@startuml WalletService_GetOrCreate
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:wallet = walletRepository.GetByUserId(user.UserId);
+if (wallet is null?) then (yes)
+  :wallet = CreateWallet(user.UserId);
+endif
+:return MapWallet(wallet);
+stop
+@enduml

@@ -1,0 +1,24 @@
+@startuml UserService_UpdateProfile
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = FindUserByToken(token);
+if (user is null?) then (yes)
+  :return null;
+  stop
+else (no)
+  :user.FullName = input.FullName.Trim();
+  :user.Phone = input.Phone.Trim();
+  :saved = _repository.Update(user);
+  if (saved is null?) then (yes)
+    :return null;
+    stop
+  else (no)
+    :return MapUser(saved);
+    stop
+  endif
+endif
+@enduml

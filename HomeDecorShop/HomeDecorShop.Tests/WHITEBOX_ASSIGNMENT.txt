@@ -1,0 +1,76 @@
+PHAN CONG WHITE-BOX TESTING - SHOPDECORBEE (7 thanh vien x 5 ham = 35 ham)
+================================================================================
+
+Moi thanh vien: ve CFG + bang TC + viet/sua test trong HomeDecorShop.Tests + dotnet test + 1 muc bao cao.
+
+THANH VIEN 1 - Auth & User (UserService.cs)
+  1. Register
+  2. Login
+  3. GetByToken
+  4. UpdateProfile
+  5. ConfirmEmail
+  File test: UserServiceAuthTests.cs
+
+THANH VIEN 2 - User Admin (UserService.cs)
+  1. GetAll
+  2. GetById
+  3. UpdateRole
+  4. ToggleStatus
+  5. Delete
+  File test: UserServiceAdminTests.cs
+
+THANH VIEN 3 - Cart (CartService.cs)
+  1. GetCurrent
+  2. AddItem
+  3. UpdateItem
+  4. RemoveItem
+  5. Clear
+  File test: CartServiceTests.cs (da co)
+
+THANH VIEN 4 - Product (ProductService.cs)
+  1. GetById
+  2. Search
+  3. Create
+  4. Update
+  5. Delete
+  File test: ProductServiceTests.cs
+
+THANH VIEN 5 - Category (CategoryService.cs)
+  1. GetAll
+  2. GetById
+  3. Create
+  4. Update
+  5. Delete
+  File test: CategoryServiceTests.cs
+
+THANH VIEN 6 - Order (OrderService.cs)
+  1. GetMine
+  2. GetById
+  3. PlaceOrder
+  4. Cancel
+  5. UpdateStatus
+  File test: OrderServiceTests.cs
+
+THANH VIEN 7 - Payment (PaymentService.cs)
+  1. GetMine
+  2. GetByOrderId
+  3. GetById
+  4. CreateVnPayPayment
+  5. Process
+  File test: PaymentServiceTests.cs
+
+THANH VIEN 8 - Wallet (WalletService.cs)
+  1. GetOrCreate
+  2. Deposit
+  3. Withdraw
+  4. PayOrder
+  5. GetTransactions
+  File test: WalletServiceTests.cs
+
+CHAY TEST:
+  cd HomeDecorShop
+  dotnet test HomeDecorShop.Tests/HomeDecorShop.Tests.csproj
+
+Ghi chu:
+  - Chia theo Postman service: Auth/User, Product, Category, Cart, Order, Payment, Wallet.
+  - Neu giao vien yeu cau dung 30 ham: bo 1 service (vd Payment hoac Wallet) hoac bo 1 phan 5 ham cua 1 thanh vien.

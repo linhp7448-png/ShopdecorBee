@@ -1,0 +1,35 @@
+@startuml WalletService_Deposit
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+if (amount <= 0) then (yes)
+  :throw RequestValidationException("Deposit amount must be greater than zero");
+  stop
+else (no)
+  :user = RequireUser(token);
+  :wallet = walletRepository.GetByUserId(user.UserId);
+  if (wallet is null?) then (yes)
+    :wallet = CreateWallet(user.UserId);
+  endif
+  
+  :now = DateTime.UtcNow;
+  :scope = CreateTransactionScope();
+  
+  :wallet.Balance += amount;
+  :wallet.UpdatedAt = now;
+  :wallet = walletRepository.Update(wallet);
+  
+  :Khởi tạo WalletTransaction mới
+  - Gán WalletId, Amount, Thời gian
+  - Thiết lập Type = Deposit, Status = Success
+  - Tạo mã Reference và Description nạp tiền;
+  
+  :walletRepository.CreateTransaction(transaction);
+  :scope.Complete();
+  :return MapWallet(wallet);
+  stop
+endif
+@enduml

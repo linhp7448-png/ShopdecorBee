@@ -1,0 +1,48 @@
+@startuml OrderService_Cancel
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(orderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :return null;
+  stop
+else (no)
+  if (order.Status != PendingPayment) then (yes)
+    :throw ConflictException("Only unpaid orders can be cancelled");
+    stop
+  else (no)
+    :hasPendingVnPayPayment = paymentRepository
+      .GetByOrderId(order.Id)
+      .Any(payment => method == "vnpay" && status == Pending);
+    
+    if (hasPendingVnPayPayment) then (yes)
+      :throw ConflictException("Orders with pending VNPay cannot be cancelled");
+      stop
+    else (no)
+      :scope = CreateTransactionScope();
+      
+      repeat
+        :product = productRepository.GetById(item.ProductId);
+        if (product is not null) then (yes)
+          :RestoreStock(product, item.Quantity);
+          :productRepository.Update(product);
+        endif
+      repeat while (more items) is (yes)
+      ->(no);
+      
+      :order.Status = Cancelled;
+      :order.PaymentStatus = Cancelled;
+      :order.UpdatedAt = DateTime.UtcNow;
+      :updated = orderRepository.Update(order);
+      :scope.Complete();
+      
+      :return MapOrder(updated);
+      stop
+    endif
+  endif
+endif
+@enduml

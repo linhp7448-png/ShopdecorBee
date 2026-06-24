@@ -1,0 +1,19 @@
+@startuml WalletService_GetTransactions
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:wallet = walletRepository.GetByUserId(user.UserId);
+if (wallet is null?) then (yes)
+  :return empty array;
+  stop
+else (no)
+  :return walletRepository.GetTransactionsByWalletId(wallet.Id)
+    .Select(MapTransaction)
+    .ToArray();
+  stop
+endif
+@enduml

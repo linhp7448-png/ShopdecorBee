@@ -1,0 +1,46 @@
+@startuml CartService_AddItem
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:product = RequirePurchasableProduct(input.ProductId);
+:now = DateTime.UtcNow;
+:cart = cartRepository.GetByUserId(user.UserId);
+:isNewCart = (cart is null);
+
+if (cart is null?) then (yes)
+  :Khởi tạo thực thể Cart mới
+  - Gán UserId = user.UserId
+  - Thiết lập CreatedAt và UpdatedAt = now
+  - Khởi tạo danh sách Items trống;
+endif
+
+:existingItem = cart.Items.FirstOrDefault(item => item.ProductId == input.ProductId);
+:desiredQuantity = (existingItem?.Quantity ?? 0) + input.Quantity;
+:EnsureStockAvailable(product, desiredQuantity);
+
+if (existingItem is null?) then (yes)
+  :Thêm CartItem mới vào giỏ hàng:
+  - ProductId = product.ProductId
+  - Quantity = desiredQuantity
+  - UnitPrice = product.Price
+  - Thời gian tạo/cập nhật = now;
+else (no)
+  :existingItem.Quantity = desiredQuantity;
+  :existingItem.UnitPrice = product.Price;
+  :existingItem.UpdatedAt = now;
+endif
+
+:cart.UpdatedAt = now;
+if (isNewCart) then (yes)
+  :saved = cartRepository.Create(cart);
+else (no)
+  :saved = cartRepository.Update(cart);
+endif
+
+:return MapCart(saved);
+stop
+@enduml

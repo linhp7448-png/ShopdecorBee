@@ -1,0 +1,61 @@
+@startuml WalletService_PayOrder
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(orderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :throw NotFoundException("Order not found");
+  stop
+else (no)
+  if (order.Status == Cancelled) then (yes)
+    :throw ConflictException("Cancelled orders cannot be paid");
+    stop
+  else (no)
+    if (order.PaymentStatus == Paid) then (yes)
+      :throw ConflictException("Order already paid");
+      stop
+    else (no)
+      if (order.Status != PendingPayment) then (yes)
+        :throw ConflictException("Only orders waiting for payment can be processed");
+        stop
+      else (no)
+        :wallet = walletRepository.GetByUserId(user.UserId);
+        if (wallet is null?) then (yes)
+          :wallet = CreateWallet(user.UserId);
+        endif
+        
+        if (wallet.Balance < order.TotalAmount) then (yes)
+          :throw ConflictException("Insufficient wallet balance");
+          stop
+        else (no)
+          :now = DateTime.UtcNow;
+          :scope = CreateTransactionScope();
+          
+          :wallet.Balance -= order.TotalAmount;
+          :wallet.UpdatedAt = now;
+          :wallet = walletRepository.Update(wallet);
+          
+          :Tạo thực thể WalletTransaction (Thanh toán đơn hàng);
+          :walletRepository.CreateTransaction(transaction);
+          
+          :Tạo thực thể Payment mới (Phương thức: wallet, Trạng thái: Paid);
+          :paymentRepository.Create(payment);
+          
+          :Cập nhật trạng thái Order: PaymentStatus = Paid, Status = Processing;
+          :orderRepository.Update(order);
+          
+          :AddToAdminWalletInternal(order.TotalAmount, "REVENUE", "Doanh thu");
+          :scope.Complete();
+          
+          :return MapWallet(wallet);
+          stop
+        endif
+      endif
+    endif
+  endif
+endif
+@enduml

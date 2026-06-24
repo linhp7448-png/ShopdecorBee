@@ -1,0 +1,19 @@
+@startuml PaymentService_GetByOrderId
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(orderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :throw NotFoundException("Order not found");
+  stop
+else (no)
+  :return paymentRepository.GetByOrderId(orderId)
+    .Select(MapPayment)
+    .ToArray();
+  stop
+endif
+@enduml

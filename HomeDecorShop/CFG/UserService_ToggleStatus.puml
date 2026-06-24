@@ -1,0 +1,18 @@
+@startuml UserService_ToggleStatus
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = _repository.GetById(userId);
+if (user is null?) then (yes)
+  :return false;
+  stop
+else (no)
+  :user.IsActive = !user.IsActive;
+  :_repository.Update(user);
+  :return true;
+  stop
+endif
+@enduml

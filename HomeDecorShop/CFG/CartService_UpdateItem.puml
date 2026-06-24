@@ -1,0 +1,31 @@
+@startuml CartService_UpdateItem
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:cart = cartRepository.GetByUserId(user.UserId);
+if (cart is null?) then (yes)
+  :throw CreateEmptyCartException();
+  stop
+else (no)
+  :item = cart.Items.FirstOrDefault(current => current.Id == itemId);
+  if (item is null?) then (yes)
+    :throw NotFoundException("Cart item not found");
+    stop
+  else (no)
+    :product = RequirePurchasableProduct(item.ProductId);
+    :EnsureStockAvailable(product, input.Quantity);
+    
+    :item.Quantity = input.Quantity;
+    :item.UnitPrice = product.Price;
+    :item.UpdatedAt = DateTime.UtcNow;
+    :cart.UpdatedAt = DateTime.UtcNow;
+    
+    :return MapCart(cartRepository.Update(cart));
+    stop
+  endif
+endif
+@enduml

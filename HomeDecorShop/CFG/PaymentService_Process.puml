@@ -1,0 +1,49 @@
+@startuml PaymentService_Process
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(input.OrderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :throw NotFoundException("Order not found");
+  stop
+else (no)
+  if (order.Status == Cancelled) then (yes)
+    :throw ConflictException("Cancelled orders cannot be paid");
+    stop
+  else (no)
+    if (order.PaymentStatus == Paid) then (yes)
+      :throw ConflictException("Order already paid");
+      stop
+    else (no)
+      if (order.Status != PendingPayment) then (yes)
+        :throw ConflictException("Only orders waiting for payment can be processed");
+        stop
+      else (no)
+        :now = DateTime.UtcNow;
+        :Khởi tạo thực thể Payment mới:
+        - OrderId = order.Id
+        - Method = Chuẩn hóa chuỗi input.Method
+        - Status = Paid, Amount = order.TotalAmount
+        - Sinh mã định danh TransactionCode
+        - Cập nhật thời gian PaidAt, CreatedAt, UpdatedAt = now;
+        
+        :scope = CreateTransactionScope();
+        :created = paymentRepository.Create(payment);
+        :order.PaymentStatus = Paid;
+        :order.Status = Processing;
+        :order.UpdatedAt = now;
+        :orderRepository.Update(order);
+        :walletService.AddToAdminWallet(order.TotalAmount, "REVENUE", "Doanh thu");
+        :scope.Complete();
+        
+        :return MapPayment(created);
+        stop
+      endif
+    endif
+  endif
+endif
+@enduml

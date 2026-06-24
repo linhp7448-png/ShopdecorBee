@@ -1,0 +1,31 @@
+@startuml UserService_Register
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:normalizedEmail = Normalize(input.Email);
+if (_repository.GetByEmail(normalizedEmail) is not null) then (yes)
+  :throw ConflictException("Email already exists");
+  stop
+else (no)
+  :Tạo token và verifyToken mới (Guid);
+  
+  :Khởi tạo thực thể User mới
+  - Email = normalizedEmail
+  - FullName = input.FullName.Trim()
+  - Phone = input.Phone?.Trim() ?? ""
+  - Role = Customer
+  - PasswordHash = BCrypt.HashPassword(input.Password)
+  - CreatedAt = DateTime.UtcNow
+  - CurrentToken = token
+  - Addresses = New List<Address>()
+  - IsEmailConfirmed = true
+  - EmailConfirmationToken = verifyToken;
+  
+  :createdUser = _repository.Create(user);
+  :return new AuthResult(token, MapUser(createdUser));
+  stop
+endif
+@enduml

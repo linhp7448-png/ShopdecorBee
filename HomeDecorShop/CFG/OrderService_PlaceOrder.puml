@@ -1,0 +1,51 @@
+@startuml OrderService_PlaceOrder
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:cart = cartRepository.GetByUserId(user.UserId);
+if (cart is null || cart.Items.Count == 0) then (yes)
+  :throw CreateEmptyCartException();
+  stop
+else (no)
+  :shipping = ResolveShippingAddress(user, input);
+  :now = DateTime.UtcNow;
+  :cartItems = cart.Items.OrderBy(item => item.Id).ToArray();
+  
+  repeat
+    :product = productRepository.GetById(cartItem.ProductId);
+    :ValidateProductForOrder(product, cartItem.Quantity);
+  repeat while (more items) is (yes)
+  ->(no);
+  
+  :orderItems = cartItems.Select(...);
+  :subtotal = orderItems.Sum(item => item.LineTotal);
+  
+  :Khởi tạo đối tượng Order mới:
+  - Gán UserId, OrderNumber (ORD-...), Status = PendingPayment
+  - Tính toán Subtotal, ShippingFee, TotalAmount
+  - Gán thông tin giao hàng (FullName, Phone, Địa chỉ) từ shipping
+  - Thiết lập danh sách Items và thời gian hệ thống;
+  
+  :scope = CreateTransactionScope();
+  
+  repeat
+    :product = productRepository.GetById(orderItem.ProductId);
+    :DecreaseStock(product, orderItem.Quantity);
+    :productRepository.Update(product);
+  repeat while (more items) is (yes)
+  ->(no);
+  
+  :created = orderRepository.Create(order);
+  :cart.Items.Clear();
+  :cart.UpdatedAt = now;
+  :cartRepository.Update(cart);
+  :scope.Complete();
+  
+  :return MapOrder(created);
+  stop
+endif
+@enduml

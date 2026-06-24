@@ -1,0 +1,24 @@
+@startuml UserService_ConfirmEmail
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+if (string.IsNullOrWhiteSpace(token)) then (yes)
+  :return false;
+  stop
+else (no)
+  :user = _repository.GetAll().FirstOrDefault(item => item.EmailConfirmationToken == token);
+  if (user is null?) then (yes)
+    :return false;
+    stop
+  else (no)
+    :user.IsEmailConfirmed = true;
+    :user.EmailConfirmationToken = null;
+    :_repository.Update(user);
+    :return true;
+    stop
+  endif
+endif
+@enduml

@@ -1,0 +1,57 @@
+@startuml ProductService_Search
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:Chuẩn hóa tham số đầu vào: page, pageSize, sort, query, categories, brands, styles;
+:query = repository.GetAll();
+
+if (!input.IncludeInactive) then (yes)
+  :Lọc bỏ các sản phẩm hoặc danh mục không kích hoạt;
+endif
+
+if (!string.IsNullOrWhiteSpace(normalizedQuery)) then (yes)
+  :Lọc sản phẩm khớp từ khóa tìm kiếm;
+endif
+
+if (categories.Count > 0) then (yes)
+  :Lọc theo danh sách danh mục;
+endif
+
+if (brands.Count > 0) then (yes)
+  :Lọc theo danh sách thương hiệu;
+endif
+
+if (styles.Count > 0) then (yes)
+  :Lọc theo danh sách kiểu dáng;
+endif
+
+if (input.MinPrice is not null) then (yes)
+  :Lọc sản phẩm có giá lớn hơn hoặc bằng MinPrice;
+endif
+
+if (input.MaxPrice is not null) then (yes)
+  :Lọc sản phẩm có giá nhỏ hơn hoặc bằng MaxPrice;
+endif
+
+if (input.InStockOnly) then (yes)
+  :Lọc sản phẩm còn hàng trong kho;
+endif
+
+if (input.OnSaleOnly) then (yes)
+  :Lọc sản phẩm đang có chương trình giảm giá;
+endif
+
+if (input.RatingGte is not null) then (yes)
+  :minRating = Math.Clamp(RatingGte, 0, 5);
+  :Lọc sản phẩm có đánh giá lớn hơn hoặc bằng minRating;
+endif
+
+:sorted = ApplySorting(query, normalizedSort, normalizedQuery);
+:total = sorted.Length;
+:items = sorted.Skip((page-1)*pageSize).Take(pageSize).Select(MapProduct);
+:return new ProductListResult(items, total, page, pageSize, sortBy);
+stop
+@enduml

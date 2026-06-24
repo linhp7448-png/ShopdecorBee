@@ -1,0 +1,25 @@
+@startuml CategoryService_Create
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:name = NormalizeName(input.Name);
+:slug = NormalizeSlug(input.Slug);
+:group = RequireActiveGroup(input.GroupId);
+
+if (Name hoặc Slug đã tồn tại trong DB?) then (yes)
+  :throw BadRequestException("Category already exists");
+  stop
+else (no)
+  :created = repository.Create(new Category);
+  :created.Name = name
+  created.Slug = slug
+  created.GroupId = group.Id
+  created.IsActive = input.IsActive;
+  
+  :return MapCategory(created);
+  stop
+endif
+@enduml

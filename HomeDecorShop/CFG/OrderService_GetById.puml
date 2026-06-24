@@ -1,0 +1,17 @@
+@startuml OrderService_GetById
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(orderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :return null;
+  stop
+else (no)
+  :return MapOrder(order);
+  stop
+endif
+@enduml

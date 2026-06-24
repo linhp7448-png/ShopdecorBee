@@ -1,0 +1,10 @@
+@startuml UserService_Delete
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:return _repository.Delete(userId);
+stop
+@enduml

@@ -1,0 +1,47 @@
+@startuml PaymentService_CreateVnPayPayment
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:order = orderRepository.GetById(input.OrderId);
+if (order is null || order.UserId != user.UserId) then (yes)
+  :throw NotFoundException("Order not found");
+  stop
+else (no)
+  if (order.Status == Cancelled) then (yes)
+    :throw ConflictException("Cancelled orders cannot be paid");
+    stop
+  else (no)
+    if (order.PaymentStatus == Paid) then (yes)
+      :throw ConflictException("Order already paid");
+      stop
+    else (no)
+      if (order.Status != PendingPayment) then (yes)
+        :throw ConflictException("Only orders waiting for payment can be processed");
+        stop
+      else (no)
+        :Tìm existingPendingPayment trong paymentRepository\nvới phương thức vnpay và trạng thái là Pending;
+        :now = DateTime.UtcNow;
+        
+        if (existingPendingPayment is not null) then (yes)
+          if (!IsVnPayTransactionCodeSafe(existingPendingPayment.TransactionCode)) then (yes)
+            :Cập nhật TransactionCode mới cho existingPendingPayment;
+            :existingPendingPayment.UpdatedAt = now;
+            :existingPendingPayment = paymentRepository.Update(existingPendingPayment);
+          endif
+          :return new VnPayCreateUrlResult(...);
+          stop
+        else (no)
+          :Khởi tạo đối tượng Payment mới\n- Phương thức: vnpay\n- Trạng thái: Pending\n- Tạo TransactionCode và gán thời gian;
+          :created = paymentRepository.Create(payment);
+          :return new VnPayCreateUrlResult với thông tin của created;
+          stop
+        endif
+      endif
+    endif
+  endif
+endif
+@enduml

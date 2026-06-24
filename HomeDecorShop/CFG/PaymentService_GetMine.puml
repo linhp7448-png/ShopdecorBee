@@ -1,0 +1,13 @@
+@startuml PaymentService_GetMine
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:user = RequireUser(token);
+:return paymentRepository.GetByUserId(user.UserId)
+  .Select(MapPayment)
+  .ToArray();
+stop
+@enduml

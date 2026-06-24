@@ -1,0 +1,43 @@
+@startuml WalletService_Withdraw
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+if (amount <= 0) then (yes)
+  :throw RequestValidationException("Withdraw amount must be greater than zero");
+  stop
+else (no)
+  :user = RequireUser(token);
+  :wallet = walletRepository.GetByUserId(user.UserId);
+  if (wallet is null?) then (yes)
+    :wallet = CreateWallet(user.UserId);
+  endif
+  
+  if (wallet.Balance < amount) then (yes)
+    :throw ConflictException("Insufficient wallet balance");
+    stop
+  else (no)
+    :now = DateTime.UtcNow;
+    :scope = CreateTransactionScope();
+    
+    :wallet.Balance -= amount;
+    :wallet.UpdatedAt = now;
+    :wallet = walletRepository.Update(wallet);
+    
+    :Khởi tạo thực thể WalletTransaction mới:
+    - WalletId = wallet.Id
+    - Amount = amount
+    - Type = Withdraw, Status = Success
+    - Reference = "WITHDRAW-{timestamp}"
+    - Description = "Rut tiền từ ví"
+    - CreatedAt = now;
+    
+    :walletRepository.CreateTransaction(transaction);
+    :scope.Complete();
+    :return MapWallet(wallet);
+    stop
+  endif
+endif
+@enduml

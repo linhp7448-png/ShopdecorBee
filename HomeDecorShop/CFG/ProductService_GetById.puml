@@ -1,0 +1,16 @@
+@startuml ProductService_GetById
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:product = repository.GetById(id);
+if (product is null?) then (yes)
+  :return null;
+  stop
+else (no)
+  :return MapProduct(product);
+  stop
+endif
+@enduml

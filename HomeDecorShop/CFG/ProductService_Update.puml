@@ -1,0 +1,51 @@
+@startuml ProductService_Update
+skinparam activity {
+  BackgroundColor #F8F8F8
+  BorderColor #333333
+}
+
+start
+:existing = repository.GetById(id);
+if (existing is null?) then (yes)
+  :return null;
+  stop
+else (no)
+  :category = RequireActiveCategory(input.CategoryId);
+  :ValidatePricing(input.Price, input.OriginalPrice);
+  :normalizedSku = NormalizeSku(input.Sku);
+  :normalizedSlug = NormalizeSlug(input.Slug);
+  :EnsureUniqueSku(normalizedSku, id);
+  :EnsureUniqueSlug(normalizedSlug, id);
+  
+  :existing.Sku = normalizedSku;
+  :existing.ProductName = input.Name.Trim();
+  :existing.Slug = normalizedSlug;
+  :existing.Price = input.Price;
+  :existing.OldPrice = input.OriginalPrice;
+  :existing.CategoryId = category.Id;
+  :existing.Category = category.Name;
+  :existing.Image = input.Image.Trim();
+  :existing.HoverImage = input.HoverImage.Trim();
+  :existing.VideoUrl = NormalizeOptional(input.VideoUrl);
+  :existing.Tag = NormalizeOptional(input.Tag);
+  :existing.SoldPercentage = input.SoldPercentage;
+  :existing.StockLeft = Math.Max(input.StockLeft, 0);
+  :existing.Rating = Math.Clamp(input.Rating, 0, 5);
+  :existing.Reviews = Math.Max(input.Reviews, 0);
+  :existing.Brand = input.Brand.Trim();
+  :existing.Color = input.Color.Trim();
+  :existing.Material = input.Material.Trim();
+  :existing.Style = input.Style.Trim();
+  :existing.InStock = input.StockLeft > 0;
+  :existing.IsActive = input.IsActive;
+  
+  :saved = repository.Update(existing);
+  if (saved is null?) then (yes)
+    :return null;
+    stop
+  else (no)
+    :return MapProduct(repository.GetById(saved.ProductId) ?? saved);
+    stop
+  endif
+endif
+@enduml
