@@ -4,26 +4,25 @@ skinparam activity {
   BorderColor #333333
 }
 
+title CFG - UpdateStatus
 start
-:user = RequireUser(token);
-if (user.Role != Admin) then (yes)
-  :throw ForbiddenException("Bạn không có quyền thực hiện hành động này");
+:RequireUser(token);
+if (user.Role != Admin?) then (yes)
+  :Throw ForbiddenException;
   stop
 else (no)
-  :order = orderRepository.GetById(orderId);
-  if (order is null) then (yes)
+  :Lấy Order từ orderRepository;
+  if (order == null?) then (yes)
     :return null;
     stop
   else (no)
-    :newStatus = MapFromSnakeCase<OrderStatus>(status);
-    :order.Status = newStatus;
-    :order.UpdatedAt = DateTime.UtcNow;
-    
-    if (newStatus == Completed) then (yes)
-      :order.PaymentStatus = Paid;
+    :Gán order.Status = newStatus;
+    if (newStatus == Completed?) then (yes)
+      :Gán order.PaymentStatus = Paid;
+    else (no)
     endif
-    
-    :return MapOrder(orderRepository.Update(order));
+    :orderRepository.Update(order);
+    :return MapOrder(updated);
     stop
   endif
 endif
