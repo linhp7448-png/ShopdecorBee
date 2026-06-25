@@ -4,47 +4,46 @@ skinparam activity {
   BorderColor #333333
 }
 
+title CFG - PlaceOrder
 start
-:user = RequireUser(token);
-:cart = cartRepository.GetByUserId(user.UserId);
-if (cart is null || cart.Items.Count == 0) then (yes)
-  :throw CreateEmptyCartException();
+:RequireUser(token);
+:Lấy Cart từ cartRepository;
+if (cart == null OR cart.Items.Count == 0?) then (yes)
+  :Throw EmptyCartException;
   stop
 else (no)
-  :shipping = ResolveShippingAddress(user, input);
-  :now = DateTime.UtcNow;
-  :cartItems = cart.Items.OrderBy(item => item.Id).ToArray();
+  :ResolveShippingAddress(user, input);
+  :Tạo mảng cartItems;
+  while (Lặp qua từng cartItem trong cartItems?) is (còn phần tử)
+    :Lấy product = productRepository.GetById(ProductId);
+    if (product == null?) then (yes)
+      :Throw NotFoundException;
+      stop
+    else (no)
+      if (!product.IsActive OR category Inactive?) then (yes)
+        :Throw ConflictException;
+        stop
+      else (no)
+        if (StockLeft < Quantity?) then (yes)
+          :Throw ConflictException;
+          stop
+        else (no)
+        endif
+      endif
+    endif
+  endwhile (hết phần tử)
   
-  repeat
-    :product = productRepository.GetById(cartItem.ProductId);
-    :ValidateProductForOrder(product, cartItem.Quantity);
-  repeat while (more items) is (yes)
-  ->(no);
+  :Map orderItems;
+  :Tính toán subtotal, tạo Order object;
+  :Mở TransactionScope;
+  while (Lặp qua từng orderItem?) is (còn phần tử)
+    :DecreaseStock(product, Quantity);
+    :Cập nhật product;
+  endwhile (hết phần tử)
   
-  :orderItems = cartItems.Select(...);
-  :subtotal = orderItems.Sum(item => item.LineTotal);
-  
-  :Khởi tạo đối tượng Order mới:
-  - Gán UserId, OrderNumber (ORD-...), Status = PendingPayment
-  - Tính toán Subtotal, ShippingFee, TotalAmount
-  - Gán thông tin giao hàng (FullName, Phone, Địa chỉ) từ shipping
-  - Thiết lập danh sách Items và thời gian hệ thống;
-  
-  :scope = CreateTransactionScope();
-  
-  repeat
-    :product = productRepository.GetById(orderItem.ProductId);
-    :DecreaseStock(product, orderItem.Quantity);
-    :productRepository.Update(product);
-  repeat while (more items) is (yes)
-  ->(no);
-  
-  :created = orderRepository.Create(order);
-  :cart.Items.Clear();
-  :cart.UpdatedAt = now;
-  :cartRepository.Update(cart);
-  :scope.Complete();
-  
+  :Tạo Order trong repository;
+  :Clear items trong cart và cập nhật cart;
+  :Complete TransactionScope;
   :return MapOrder(created);
   stop
 endif
