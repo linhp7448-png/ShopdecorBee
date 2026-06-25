@@ -4,42 +4,38 @@ skinparam activity {
   BorderColor #333333
 }
 
+title CFG - Cancel
 start
-:user = RequireUser(token);
-:order = orderRepository.GetById(orderId);
-if (order is null || order.UserId != user.UserId) then (yes)
+:RequireUser(token);
+:Lấy Order từ orderRepository;
+if (order == null?) then (yes)
+  :return null;
+  stop
+else if (order.UserId != user.UserId?) then (yes)
   :return null;
   stop
 else (no)
-  if (order.Status != PendingPayment) then (yes)
-    :throw ConflictException("Only unpaid orders can be cancelled");
+  if (order.Status != PendingPayment?) then (yes)
+    :Throw ConflictException;
     stop
   else (no)
-    :hasPendingVnPayPayment = paymentRepository
-      .GetByOrderId(order.Id)
-      .Any(payment => method == "vnpay" && status == Pending);
-    
-    if (hasPendingVnPayPayment) then (yes)
-      :throw ConflictException("Orders with pending VNPay cannot be cancelled");
+    if (Có giao dịch VNPay pending?) then (yes)
+      :Throw ConflictException;
       stop
     else (no)
-      :scope = CreateTransactionScope();
-      
-      repeat
-        :product = productRepository.GetById(item.ProductId);
-        if (product is not null) then (yes)
-          :RestoreStock(product, item.Quantity);
-          :productRepository.Update(product);
+      :Mở TransactionScope;
+      while (Lặp qua từng orderItem?) is (còn phần tử)
+        if (Product tồn tại?) then (yes)
+          :RestoreStock(product, Quantity);
+          :Cập nhật product;
+        else (no)
         endif
-      repeat while (more items) is (yes)
-      ->(no);
+      endwhile (hết phần tử)
       
-      :order.Status = Cancelled;
-      :order.PaymentStatus = Cancelled;
-      :order.UpdatedAt = DateTime.UtcNow;
-      :updated = orderRepository.Update(order);
-      :scope.Complete();
-      
+      :Cập nhật Status = Cancelled;
+      :Cập nhật PaymentStatus = Cancelled;
+      :orderRepository.Update(order);
+      :Complete TransactionScope;
       :return MapOrder(updated);
       stop
     endif
