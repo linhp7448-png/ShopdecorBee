@@ -77,8 +77,8 @@ public class ProductServiceTests
         // Arrange
         var products = new List<Product>
         {
-            new() { ProductId = 1, ProductName = "Modern Sofa", IsActive = true, Price = 1000, Sku = "S1", Category = "C1" },
-            new() { ProductId = 2, ProductName = "Classic Lamp", IsActive = true, Price = 500, Sku = "L1", Category = "C1" }
+            new() { ProductId = 1, ProductName = "Modern Sofa", IsActive = true, Price = 1000, Sku = "S1", Category = "C1", Slug = "s1" },
+            new() { ProductId = 2, ProductName = "Classic Lamp", IsActive = true, Price = 500, Sku = "L1", Category = "C1", Slug = "l1" }
         };
         _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
@@ -100,7 +100,7 @@ result.Items.Should().ContainSingle();
     {
         // Arrange
         var existingSku = "EXISTING-SKU";
-        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Test" });
+        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Test", IsActive = true });
         _productRepoMock.Setup(x => x.GetBySku(existingSku)).Returns(new Product { ProductId = 50, Sku = existingSku });
 
         var input = new ProductUpsertInput
@@ -108,14 +108,17 @@ result.Items.Should().ContainSingle();
             Sku = existingSku,
             Name = "New Item",
             Price = 100,
-            CategoryId = 1
+            CategoryId = 1,
+            Slug = "new-item",
+            Category = "Test"
         };
 
         // Act
         Action action = () => _productService.Create(input);
 
         // Assert
-        action.Should().Throw<ConflictException>().WithMessage("*exists*");
+        // FIX: Đã đổi từ "*exists*" thành "*in use*" để khớp chính xác với thông báo lỗi từ code gốc của bạn
+        action.Should().Throw<ConflictException>().WithMessage("*in use*");
     }
 
     [Fact]
@@ -151,7 +154,7 @@ result.Items.Should().ContainSingle();
         // Arrange
         var originalProduct = new Product { ProductId = 1, ProductName = "Old Name", Price = 100, Sku = "OLD-SKU" };
         _productRepoMock.Setup(x => x.GetById(1)).Returns(originalProduct);
-        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Decor" });
+        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Decor", IsActive = true });
         _productRepoMock.Setup(x => x.Update(It.IsAny<Product>())).Returns<Product>(p => p);
 
         var updateInfo = new ProductUpsertInput
@@ -160,6 +163,8 @@ result.Items.Should().ContainSingle();
             Sku = "VASE-001",
             Price = 450000,
             CategoryId = 1,
+            Category = "Decor",
+            Slug = "premium-vase",
             IsActive = true
         };
 
@@ -178,13 +183,13 @@ result.Items.Should().ContainSingle();
         // Arrange
         var products = new List<Product>
         {
-            new() { ProductId = 1, Price = 1000, ProductName = "Cheap", Sku = "C", IsActive = true },
-            new() { ProductId = 2, Price = 9000, ProductName = "Expensive", Sku = "E", IsActive = true }
+new() { ProductId = 1, Price = 1000, ProductName = "Cheap", Sku = "C", IsActive = true, Slug = "c" },
+            new() { ProductId = 2, Price = 9000, ProductName = "Expensive", Sku = "E", IsActive = true, Slug = "e" }
         };
         _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
         var query = new ProductQuery(
-Query: null, Category: null, Brand: null, Style: null,
+            Query: null, Category: null, Brand: null, Style: null,
             MinPrice: 2000, MaxPrice: 5000, InStockOnly: false, OnSaleOnly: false,
             RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false);
 
@@ -201,8 +206,8 @@ Query: null, Category: null, Brand: null, Style: null,
         // Arrange
         var products = new List<Product>
         {
-            new() { ProductId = 1, ProductName = "In Stock", StockLeft = 5, IsActive = true },
-            new() { ProductId = 2, ProductName = "Sold Out", StockLeft = 0, InStock = false, IsActive = true }
+            new() { ProductId = 1, ProductName = "In Stock", StockLeft = 5, IsActive = true, Sku = "s1", Slug = "s1" },
+            new() { ProductId = 2, ProductName = "Sold Out", StockLeft = 0, InStock = false, IsActive = true, Sku = "s2", Slug = "s2" }
         };
         _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
@@ -225,8 +230,8 @@ Query: null, Category: null, Brand: null, Style: null,
         // Arrange
         var products = new List<Product>
         {
-            new() { ProductId = 1, ProductName = "Low", Price = 100, IsActive = true },
-            new() { ProductId = 2, ProductName = "High", Price = 999, IsActive = true }
+            new() { ProductId = 1, ProductName = "Low", Price = 100, IsActive = true, Sku = "s1", Slug = "s1" },
+            new() { ProductId = 2, ProductName = "High", Price = 999, IsActive = true, Sku = "s2", Slug = "s2" }
         };
         _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
