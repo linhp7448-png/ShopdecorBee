@@ -5,7 +5,6 @@ using Moq;
 
 namespace HomeDecorShop.Tests;
 
-/// <summary>Thanh vien 6: GetMine, GetById, PlaceOrder, Cancel, UpdateStatus</summary>
 public class OrderServiceTests
 {
     private readonly Mock<IOrderRepository> _orders = new();
@@ -218,5 +217,124 @@ public class OrderServiceTests
 
         result.Should().NotBeNull();
         result!.Status.Should().Be("cancelled");
+    }
+
+    [Fact]
+    public void GetById_ShouldReturnNull_WhenOrderNotFound()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _orders.Setup(r => r.GetById(1)).Returns((Order?)null);
+        _service.GetById("tok", 1).Should().BeNull();
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenCartItemsEmpty()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _carts.Setup(r => r.GetByUserId(1)).Returns(new Cart { Items = new List<CartItem>() });
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput());
+        act.Should().Throw<RequestValidationException>().WithMessage("*Cart is empty*");
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenAddressIdInvalid()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _carts.Setup(r => r.GetByUserId(1)).Returns(new Cart { Items = new List<CartItem> { new CartItem() } });
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput { AddressId = 999 });
+        act.Should().Throw<RequestValidationException>().WithMessage("*Shipping address is invalid*");
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldUseDefaultAddress_WhenNoInputAddressProvided()
+    {
+        var customerWithAddress = new User { UserId = 1, Role = UserRole.Customer, Addresses = new List<Address> { new Address { Id = 1, IsDefault = true, FullName = "Def", Phone = "01", Line1 = "1", Ward = "w", District = "d", City = "c" } } };
+        _users.Setup(r => r.GetByToken("tok")).Returns(customerWithAddress);
+        var cart = new Cart { Items = new List<CartItem> { new CartItem { ProductId = 100, Quantity = 1 } } };
+        _carts.Setup(r => r.GetByUserId(1)).Returns(cart);
+        _products.Setup(r => r.GetById(100)).Returns(new Product { ProductId = 100, Price = 10, IsActive = true, StockLeft = 10, CategoryNavigation = new Category { IsActive = true } });
+        _orders.Setup(r => r.Create(It.IsAny<Order>())).Returns<Order>(o => o);
+        
+        var res = _service.PlaceOrder("tok", new PlaceOrderInput());
+        res.FullName.Should().Be("Def");
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenNoShippingInfoAndNoDefaultAddress()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var cart = new Cart { Items = new List<CartItem> { new CartItem { ProductId = 100, Quantity = 1 } } };
+        _carts.Setup(r => r.GetByUserId(1)).Returns(cart);
+        
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput());
+        act.Should().Throw<RequestValidationException>().WithMessage("*Shipping information is required*");
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenProductNotFound()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var cart = new Cart { Items = new List<CartItem> { new CartItem { ProductId = 100, Quantity = 1 } } };
+        _carts.Setup(r => r.GetByUserId(1)).Returns(cart);
+        _products.Setup(r => r.GetById(100)).Returns((Product?)null);
+        
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput { FullName = "A", Phone = "0", Line1 = "1", Ward = "w", District = "d", City = "c" });
+        act.Should().Throw<NotFoundException>();
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenProductInactive()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var cart = new Cart { Items = new List<CartItem> { new CartItem { ProductId = 100, Quantity = 1 } } };
+        _carts.Setup(r => r.GetByUserId(1)).Returns(cart);
+        _products.Setup(r => r.GetById(100)).Returns(new Product { ProductId = 100, IsActive = false });
+        
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput { FullName = "A", Phone = "0", Line1 = "1", Ward = "w", District = "d", City = "c" });
+        act.Should().Throw<ConflictException>();
+    }
+
+    [Fact]
+    public void PlaceOrder_ShouldThrow_WhenProductOutOfStock()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var cart = new Cart { Items = new List<CartItem> { new CartItem { ProductId = 100, Quantity = 5 } } };
+        _carts.Setup(r => r.GetByUserId(1)).Returns(cart);
+        _products.Setup(r => r.GetById(100)).Returns(new Product { ProductId = 100, IsActive = true, StockLeft = 2, CategoryNavigation = new Category { IsActive = true } });
+        
+        var act = () => _service.PlaceOrder("tok", new PlaceOrderInput { FullName = "A", Phone = "0", Line1 = "1", Ward = "w", District = "d", City = "c" });
+        act.Should().Throw<ConflictException>();
+    }
+
+    [Fact]
+    public void Cancel_ShouldThrow_WhenHasPendingVnPay()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _orders.Setup(r => r.GetById(1)).Returns(new Order { Id = 1, UserId = 1, Status = OrderStatus.PendingPayment, Items = new List<OrderItem>() });
+        _payments.Setup(r => r.GetByOrderId(1)).Returns(new[] { new Payment { Method = "vnpay", Status = PaymentStatus.Pending } });
+        
+        var act = () => _service.Cancel("tok", 1);
+        act.Should().Throw<ConflictException>().WithMessage("*pending VNPay*");
+    }
+
+    [Fact]
+    public void UpdateStatus_ShouldReturnNull_WhenOrderNotFound()
+    {
+        _users.Setup(r => r.GetByToken("admin-tok")).Returns(Admin);
+        _orders.Setup(r => r.GetById(1)).Returns((Order?)null);
+        _service.UpdateStatus("admin-tok", 1, "processing").Should().BeNull();
+    }
+
+    [Fact]
+    public void UpdateStatus_ShouldUpdatePaymentStatusToPaid_WhenCompleted()
+    {
+        _users.Setup(r => r.GetByToken("admin-tok")).Returns(Admin);
+        var order = new Order { Id = 1, UserId = 1, Status = OrderStatus.Processing, PaymentStatus = PaymentStatus.Pending, Items = new List<OrderItem>() };
+        _orders.Setup(r => r.GetById(1)).Returns(order);
+        _orders.Setup(r => r.Update(It.IsAny<Order>())).Returns<Order>(o => o);
+        
+        var result = _service.UpdateStatus("admin-tok", 1, "completed");
+        result!.Status.Should().Be("completed");
+        result.PaymentStatus.Should().Be("paid");
     }
 }
