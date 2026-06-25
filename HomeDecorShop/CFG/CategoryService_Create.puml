@@ -1,29 +1,43 @@
-@startuml CategoryService_Create
-skinparam activity {
-  BackgroundColor #F8F8F8
-  BorderColor #333333
-  ArrowColor #555555
-}
-
+@startuml CategoryService_Create_WhiteBox
 start
 :name = NormalizeName(input.Name);
 :slug = NormalizeSlug(input.Slug);
-:group = RequireActiveGroup(input.GroupId);
 
-if (Slug đã tồn tại trong DB?) then (yes)
-  :throw ConflictException("Category already exists");
-  stop
-else (no)
-  :categoryToCreate = new Category {
-    Name = name,
-    Slug = slug,
-    GroupId = group.Id,
-    IsActive = input.IsActive
-  };
-  
-  :created = repository.Create(categoryToCreate);
-  
-  :return MapCategory(created);
+:group = repository.GetGroupById(input.GroupId);
+if (group is null?) then (yes)
+  :throw ConflictException(CategoryGroupInvalid);
   stop
 endif
+if (group.IsActive == false?) then (yes)
+  :throw ConflictException(CategoryGroupInactive);
+  stop
+endif
+
+:normalizedName = NormalizeLookup(name);
+:existingName = repository.GetAll()
+  .FirstOrDefault(c =>
+    NormalizeLookup(c.Name) == normalizedName
+    and c.Id != null);
+note right: excludedCategoryId = null khi Create\n→ điều kiện c.Id != null luôn true với\nmọi category đã tồn tại
+if (existingName is not null?) then (yes)
+  :throw ConflictException(CategoryNameAlreadyExists);
+  stop
+endif
+
+:existingSlug = repository.GetBySlug(slug);
+if (existingSlug is not null AND existingSlug.Id != null?) then (yes)
+  :throw ConflictException(CategorySlugAlreadyExists);
+  stop
+endif
+
+:categoryToCreate = new Category {
+  Name = name,
+  Slug = slug,
+  GroupId = group.Id,
+  IsActive = input.IsActive
+};
+
+:created = repository.Create(categoryToCreate);
+:return MapCategory(created);
+stop
 @enduml
