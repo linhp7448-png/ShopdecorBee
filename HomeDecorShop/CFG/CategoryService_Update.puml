@@ -3,7 +3,6 @@ skinparam activity {
   BackgroundColor #F8F8F8
   BorderColor #333333
 }
-
 start
 :category = repository.GetById(categoryId);
 if (category is null?) then (yes)
@@ -12,24 +11,30 @@ if (category is null?) then (yes)
 else (no)
   :name = NormalizeName(input.Name);
   :slug = NormalizeSlug(input.Slug);
-  
-  if (Trùng Name/Slug với Category khác HOẶC GroupId không hợp lệ?) then (yes)
-    :throw BadRequestException("Invalid data or duplicate");
+  :group = RequireActiveGroup(input.GroupId);
+  note right: throw ConflictException nếu GroupId\nkhông tồn tại hoặc group inactive
+
+  :EnsureUniqueName(name, categoryId);
+  note right: throw ConflictException nếu\ntrùng Name với category khác
+
+  :EnsureUniqueSlug(slug, categoryId);
+  note right: throw ConflictException nếu\ntrùng Slug với category khác
+
+  :EnsureCanDeactivate(category, input.IsActive);
+  note right: throw ConflictException nếu deactivate\ncategory đang còn active products
+
+  :category.Name = name;
+  :category.Slug = slug;
+  :category.GroupId = group.Id;
+  :category.IsActive = input.IsActive;
+
+  :updated = repository.Update(category);
+  if (updated is null?) then (yes)
+    :return null;
     stop
   else (no)
-    :category.Name = name;
-    :category.Slug = slug;
-    :category.GroupId = input.GroupId;
-    :category.IsActive = input.IsActive;
-    
-    :updated = repository.Update(category);
-    if (updated is null?) then (yes)
-      :return null;
-      stop
-    else (no)
-      :return MapCategory(updated);
-      stop
-    endif
+    :return MapCategory(updated);
+    stop
   endif
 endif
 @enduml
