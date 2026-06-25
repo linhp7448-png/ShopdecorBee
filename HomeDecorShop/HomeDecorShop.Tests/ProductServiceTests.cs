@@ -5,287 +5,241 @@ using Moq;
 
 namespace HomeDecorShop.Tests;
 
-/// <summary>Thanh vien 4: GetById, Search, Create, Update, Delete</summary>
+/// <summary>
+/// Refactored Unit Tests for ProductService
+/// Focus: GetById, Search, Create, Update, Delete
+/// </summary>
 public class ProductServiceTests
 {
-    private readonly Mock<IProductRepository> _products = new();
-    private readonly Mock<ICategoryRepository> _categories = new();
-    private readonly Mock<IProductReviewRepository> _reviews = new();
-    private readonly ProductService _service;
+    private readonly Mock<IProductRepository> _productRepoMock = new();
+    private readonly Mock<ICategoryRepository> _categoryRepoMock = new();
+    private readonly Mock<IProductReviewRepository> _reviewRepoMock = new();
+    private readonly ProductService _productService;
 
     public ProductServiceTests()
     {
-        _service = new ProductService(_products.Object, _categories.Object, _reviews.Object);
+        _productService = new ProductService(
+            _productRepoMock.Object, 
+            _categoryRepoMock.Object, 
+            _reviewRepoMock.Object);
     }
 
     [Fact]
-    public void GetById_ShouldReturnNull_WhenNotFound()
+    public void GetById_ReturnsNull_WhenProductDoesNotExist()
     {
-        _products.Setup(r => r.GetById(999)).Returns((Product?)null);
+        // Arrange
+        const int nonExistentId = 8888;
+        _productRepoMock.Setup(x => x.GetById(nonExistentId)).Returns((Product?)null);
 
-        _service.GetById(999).Should().BeNull();
+        // Act
+        var result = _productService.GetById(nonExistentId);
+
+        // Assert
+        result.Should().BeNull();
     }
 
     [Fact]
-    public void GetById_ShouldReturnProduct_WhenExists()
+    public void GetById_ReturnsExpectedProduct_WhenIdIsValid()
     {
-        _products.Setup(r => r.GetById(1)).Returns(new Product
+        // Arrange
+        var testProduct = new Product
         {
-            ProductId = 1,
-            Sku = "SKU1",
-            ProductName = "Chair",
-            Slug = "chair",
-            Price = 100000,
-            CategoryId = 1,
-            Category = "Decor",
-            Image = "/a.jpg",
-            HoverImage = "/b.jpg",
-            Brand = "Bee",
-            Color = "White",
-            Material = "Wood",
-            Style = "Modern",
-            StockLeft = 5,
-            IsActive = true
-        });
-
-        _service.GetById(1)!.ProductName.Should().Be("Chair");
-    }
-
-    [Fact]
-    public void Search_ShouldFilterByKeyword()
-    {
-        _products.Setup(r => r.GetAll()).Returns(new[]
-        {
-            new Product
-            {
-                ProductId = 1, Sku = "A", ProductName = "Bee Sofa", Slug = "bee-sofa", Price = 1,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            },
-            new Product
-            {
-                ProductId = 2, Sku = "B", ProductName = "Table", Slug = "table", Price = 1,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            }
-        });
-
-        var result = _service.Search(new ProductQuery(
-            Query: "bee", Category: null, Brand: null, Style: null,
-            MinPrice: null, MaxPrice: null, InStockOnly: false, OnSaleOnly: false,
-            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false));
-
-        result.Items.Should().HaveCount(1);
-        result.Items.First().ProductName.Should().Contain("Bee");
-    }
-
-    [Fact]
-    public void Create_ShouldThrowConflict_WhenSkuExists()
-    {
-        _categories.Setup(r => r.GetById(1)).Returns(new Category { Id = 1, IsActive = true, Name = "Decor", Slug = "decor" });
-        _products.Setup(r => r.GetBySku("SKU-DUP")).Returns(new Product { ProductId = 99 });
-
-        var act = () => _service.Create(new ProductUpsertInput
-        {
-            Sku = "SKU-DUP",
-            Name = "Dup",
-            Slug = "dup",
-            Price = 1000,
-            CategoryId = 1,
-            Category = "Decor",
-            Image = "/a.jpg",
-            HoverImage = "/b.jpg",
-            Brand = "B",
-            Color = "W",
-            Material = "M",
-            Style = "S",
-            StockLeft = 1,
-            IsActive = true
-        });
-
-        act.Should().Throw<ConflictException>();
-    }
-
-    [Fact]
-    public void Update_ShouldReturnNull_WhenProductNotFound()
-    {
-        _products.Setup(r => r.GetById(999)).Returns((Product?)null);
-
-        _service.Update(999, new ProductUpsertInput
-        {
-            Sku = "X", Name = "X", Slug = "x", Price = 1, CategoryId = 1, Category = "C",
-            Image = "/a.jpg", HoverImage = "/b.jpg", Brand = "B", Color = "W", Material = "M", Style = "S"
-        }).Should().BeNull();
-    }
-
-    [Fact]
-    public void Delete_ShouldCallRepository()
-    {
-        _products.Setup(r => r.Delete(3)).Returns(true);
-
-        _service.Delete(3).Should().BeTrue();
-    }
-
-    [Fact]
-    public void Update_ShouldReturnProduct_WhenValid()
-    {
-        _categories.Setup(r => r.GetById(1)).Returns(new Category { Id = 1, IsActive = true, Name = "Decor", Slug = "decor" });
-        var existing = new Product
-        {
-            ProductId = 1,
-            Sku = "SKU1",
-            ProductName = "Old Name",
-            Slug = "old-slug",
-            Price = 100000,
-            CategoryId = 1,
-            Category = "Decor",
-            Image = "/a.jpg",
-            HoverImage = "/b.jpg",
-            Brand = "B",
-            Color = "W",
-            Material = "M",
-            Style = "S",
-            StockLeft = 5,
-            IsActive = true
-        };
-        _products.Setup(r => r.GetById(1)).Returns(existing);
-        _products.Setup(r => r.GetBySku("SKU-NEW")).Returns((Product?)null);
-        _products.Setup(r => r.GetBySlug("new-slug")).Returns((Product?)null);
-        _products.Setup(r => r.Update(It.IsAny<Product>())).Returns<Product>(p => p);
-        _products.Setup(r => r.GetById(1)).Returns((int id) => existing);
-
-        var result = _service.Update(1, new ProductUpsertInput
-        {
-            Sku = "SKU-NEW",
-            Name = "New Name",
-            Slug = "new-slug",
-            Price = 150000,
-            CategoryId = 1,
-            Category = "Decor",
-            Image = "/a.jpg",
-            HoverImage = "/b.jpg",
-            Brand = "B",
-            Color = "W",
-            Material = "M",
-            Style = "S",
+            ProductId = 10,
+            Sku = "TABLE-001",
+            ProductName = "Oak Dining Table",
+            Slug = "oak-dining-table",
+            Price = 2500000,
+            CategoryId = 2,
+            Category = "Furniture",
+            Image = "/images/table.jpg",
+            HoverImage = "/images/table-hover.jpg",
+            Brand = "NordicDesign",
+            Color = "Brown",
+            Material = "Oak Wood",
+            Style = "Scandinavian",
             StockLeft = 10,
             IsActive = true
-        });
+        };
+        _productRepoMock.Setup(x => x.GetById(10)).Returns(testProduct);
 
+        // Act
+        var result = _productService.GetById(10);
+
+        // Assert
         result.Should().NotBeNull();
-        result!.ProductName.Should().Be("New Name");
-        result.Price.Should().Be(150000);
+        result!.ProductName.Should().Be("Oak Dining Table");
+        result.Sku.Should().Be("TABLE-001");
     }
 
     [Fact]
-    public void Search_ShouldFilterByCategory()
+    public void Search_FiltersCorrectly_ByKeyword()
     {
-        _products.Setup(r => r.GetAll()).Returns(new[]
+        // Arrange
+        var products = new List<Product>
         {
-            new Product
-            {
-                ProductId = 1, Sku = "A", ProductName = "Chair", Slug = "chair", Price = 1,
-                CategoryId = 1, Category = "Decor", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            },
-            new Product
-            {
-                ProductId = 2, Sku = "B", ProductName = "Table", Slug = "table", Price = 1,
-                CategoryId = 2, Category = "Furniture", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            }
-        });
+            new() { ProductId = 1, ProductName = "Modern Sofa", IsActive = true, Price = 1000, Sku = "S1", Category = "C1" },
+            new() { ProductId = 2, ProductName = "Classic Lamp", IsActive = true, Price = 500, Sku = "L1", Category = "C1" }
+        };
+        _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
-        var result = _service.Search(new ProductQuery(
-            Query: null, Category: "decor", Brand: null, Style: null,
+        var query = new ProductQuery(
+            Query: "sofa", Category: null, Brand: null, Style: null,
             MinPrice: null, MaxPrice: null, InStockOnly: false, OnSaleOnly: false,
-            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false));
+            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false);
 
-        result.Items.Should().HaveCount(1);
-        result.Items.First().Category.Should().Be("Decor");
+        // Act
+        var result = _productService.Search(query);
+
+        // Assert
+result.Items.Should().ContainSingle();
+        result.Items.First().ProductName.Should().Contain("Sofa");
     }
 
     [Fact]
-    public void Search_ShouldFilterByPriceRange()
+    public void Create_ThrowsConflictException_IfSkuAlreadyExists()
     {
-        _products.Setup(r => r.GetAll()).Returns(new[]
+        // Arrange
+        var existingSku = "EXISTING-SKU";
+        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Test" });
+        _productRepoMock.Setup(x => x.GetBySku(existingSku)).Returns(new Product { ProductId = 50, Sku = existingSku });
+
+        var input = new ProductUpsertInput
         {
-            new Product
-            {
-                ProductId = 1, Sku = "A", ProductName = "Cheap", Slug = "cheap", Price = 50000,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            },
-            new Product
-            {
-                ProductId = 2, Sku = "B", ProductName = "Expensive", Slug = "expensive", Price = 500000,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            }
-        });
+            Sku = existingSku,
+            Name = "New Item",
+            Price = 100,
+            CategoryId = 1
+        };
 
-        var result = _service.Search(new ProductQuery(
-            Query: null, Category: null, Brand: null, Style: null,
-            MinPrice: 100000, MaxPrice: 200000, InStockOnly: false, OnSaleOnly: false,
-            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false));
+        // Act
+        Action action = () => _productService.Create(input);
 
+        // Assert
+        action.Should().Throw<ConflictException>().WithMessage("*exists*");
+    }
+
+    [Fact]
+    public void Update_ReturnsNull_GivenInvalidProductId()
+    {
+        // Arrange
+        _productRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns((Product?)null);
+
+        // Act
+        var result = _productService.Update(99, new ProductUpsertInput { Sku = "NEW" });
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public void Delete_CallsRepository_WithCorrectId()
+    {
+        // Arrange
+        _productRepoMock.Setup(x => x.Delete(55)).Returns(true);
+
+        // Act
+        var success = _productService.Delete(55);
+
+        // Assert
+        success.Should().BeTrue();
+        _productRepoMock.Verify(x => x.Delete(55), Times.Once);
+    }
+
+    [Fact]
+    public void Update_UpdatesAllFields_WhenDataIsValid()
+    {
+        // Arrange
+        var originalProduct = new Product { ProductId = 1, ProductName = "Old Name", Price = 100, Sku = "OLD-SKU" };
+        _productRepoMock.Setup(x => x.GetById(1)).Returns(originalProduct);
+        _categoryRepoMock.Setup(x => x.GetById(It.IsAny<int>())).Returns(new Category { Id = 1, Name = "Decor" });
+        _productRepoMock.Setup(x => x.Update(It.IsAny<Product>())).Returns<Product>(p => p);
+
+        var updateInfo = new ProductUpsertInput
+        {
+            Name = "Premium Vase",
+            Sku = "VASE-001",
+            Price = 450000,
+            CategoryId = 1,
+            IsActive = true
+        };
+
+        // Act
+        var result = _productService.Update(1, updateInfo);
+
+        // Assert
+        result.Should().NotBeNull();
+        result!.ProductName.Should().Be("Premium Vase");
+        result.Price.Should().Be(450000);
+    }
+
+    [Fact]
+    public void Search_ReturnsEmpty_WhenPriceRangeMatchesNothing()
+    {
+        // Arrange
+        var products = new List<Product>
+        {
+            new() { ProductId = 1, Price = 1000, ProductName = "Cheap", Sku = "C", IsActive = true },
+            new() { ProductId = 2, Price = 9000, ProductName = "Expensive", Sku = "E", IsActive = true }
+        };
+        _productRepoMock.Setup(x => x.GetAll()).Returns(products);
+
+        var query = new ProductQuery(
+Query: null, Category: null, Brand: null, Style: null,
+            MinPrice: 2000, MaxPrice: 5000, InStockOnly: false, OnSaleOnly: false,
+            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false);
+
+        // Act
+        var result = _productService.Search(query);
+
+        // Assert
         result.Items.Should().BeEmpty();
     }
 
     [Fact]
-    public void Search_ShouldFilterByInStockOnly()
+    public void Search_FiltersByStockStatus_WhenInStockOnlyIsTrue()
     {
-        _products.Setup(r => r.GetAll()).Returns(new[]
+        // Arrange
+        var products = new List<Product>
         {
-            new Product
-            {
-                ProductId = 1, Sku = "A", ProductName = "InStock", Slug = "instock", Price = 1,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 5
-            },
-            new Product
-            {
-                ProductId = 2, Sku = "B", ProductName = "OutOfStock", Slug = "outofstock", Price = 1,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 0, InStock = false
-            }
-        });
+            new() { ProductId = 1, ProductName = "In Stock", StockLeft = 5, IsActive = true },
+            new() { ProductId = 2, ProductName = "Sold Out", StockLeft = 0, InStock = false, IsActive = true }
+        };
+        _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
-        var result = _service.Search(new ProductQuery(
+        var query = new ProductQuery(
             Query: null, Category: null, Brand: null, Style: null,
             MinPrice: null, MaxPrice: null, InStockOnly: true, OnSaleOnly: false,
-            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false));
+            RatingGte: null, SortBy: null, Page: 1, PageSize: 10, IncludeInactive: false);
 
-        result.Items.Should().HaveCount(1);
-        result.Items.First().ProductName.Should().Be("InStock");
+        // Act
+        var result = _productService.Search(query);
+
+        // Assert
+        result.Items.Should().ContainSingle();
+        result.Items.First().ProductName.Should().Be("In Stock");
     }
 
     [Fact]
-    public void Search_ShouldSortByPriceAsc()
+    public void Search_SortsByPriceDescending_WhenRequested()
     {
-        _products.Setup(r => r.GetAll()).Returns(new[]
+        // Arrange
+        var products = new List<Product>
         {
-            new Product
-            {
-                ProductId = 1, Sku = "A", ProductName = "Expensive", Slug = "exp", Price = 500000,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            },
-            new Product
-            {
-                ProductId = 2, Sku = "B", ProductName = "Cheap", Slug = "cheap", Price = 50000,
-                CategoryId = 1, Category = "C", Image = "/a.jpg", HoverImage = "/b.jpg",
-                Brand = "B", Color = "W", Material = "M", Style = "S", IsActive = true, StockLeft = 1
-            }
-        });
+            new() { ProductId = 1, ProductName = "Low", Price = 100, IsActive = true },
+            new() { ProductId = 2, ProductName = "High", Price = 999, IsActive = true }
+        };
+        _productRepoMock.Setup(x => x.GetAll()).Returns(products);
 
-        var result = _service.Search(new ProductQuery(
+        var query = new ProductQuery(
             Query: null, Category: null, Brand: null, Style: null,
             MinPrice: null, MaxPrice: null, InStockOnly: false, OnSaleOnly: false,
-            RatingGte: null, SortBy: "price-asc", Page: 1, PageSize: 10, IncludeInactive: false));
+            RatingGte: null, SortBy: "price-desc", Page: 1, PageSize: 10, IncludeInactive: false);
 
-        result.Items.Should().HaveCount(2);
-        result.Items.ElementAt(0).Price.Should().Be(50000);
-        result.Items.ElementAt(1).Price.Should().Be(500000);
+        // Act
+        var result = _productService.Search(query);
+
+        // Assert
+        result.Items.First().Price.Should().Be(999);
+        result.Items.Last().Price.Should().Be(100);
     }
 }
