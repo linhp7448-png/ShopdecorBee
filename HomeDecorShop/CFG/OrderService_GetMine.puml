@@ -4,11 +4,12 @@ skinparam activity {
   BorderColor #333333
 }
 
+title CFG - GetMine
 start
-:user = RequireUser(token);
-:return orderRepository.GetByUserId(user.UserId)
-  .OrderByDescending(o => o.CreatedAt)
-  .Select(MapOrder)
-  .ToArray();
+:RequireUser(token);
+:Lấy đơn hàng từ orderRepository.GetByUserId(user.UserId);
+:Sắp xếp OrderByDescending(CreatedAt);
+:Ánh xạ dữ liệu bằng MapOrder;
+:Chuyển thành Mảng (ToArray);
 stop
 @enduml
