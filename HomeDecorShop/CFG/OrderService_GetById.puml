@@ -4,14 +4,16 @@ skinparam activity {
   BorderColor #333333
 }
 
+title CFG - GetById
 start
-:user = RequireUser(token);
-:order = orderRepository.GetById(orderId);
-if (order is null || order.UserId != user.UserId) then (yes)
+:RequireUser(token);
+:Lấy order = orderRepository.GetById(orderId);
+if (order is null?) then (yes)
   :return null;
-  stop
+else if (order.UserId != user.UserId?) then (yes)
+  :return null;
 else (no)
   :return MapOrder(order);
-  stop
 endif
+stop
 @enduml
