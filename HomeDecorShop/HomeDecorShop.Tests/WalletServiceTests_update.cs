@@ -51,6 +51,7 @@ public class WalletServiceTestsUpdate
         var result = _service.Deposit("tok", 5000);
 
         result.Balance.Should().Be(6000);
+        _walletRepo.Verify(r => r.Update(It.IsAny<Wallet>()), Times.Once);
         _walletRepo.Verify(r => r.CreateTransaction(It.IsAny<WalletTransaction>()), Times.Once);
     }
 
@@ -62,5 +63,68 @@ public class WalletServiceTestsUpdate
         var act = () => _service.Deposit("tok", 0);
 
         act.Should().Throw<RequestValidationException>();
+    }
+
+    [Fact]
+    public void Deposit_ShouldThrow_WhenTokenIsInvalid()
+    {
+        _userRepo.Setup(r => r.GetByToken("invalid_token")).Returns((User?)null);
+
+        var act = () => _service.Deposit("invalid_token", 1000);
+
+        act.Should().Throw<UnauthorizedException>();
+    }
+
+    [Fact]
+    public void Withdraw_ShouldThrow_WhenTokenIsInvalid()
+    {
+        _userRepo.Setup(r => r.GetByToken("invalid_token")).Returns((User?)null);
+
+        var act = () => _service.Withdraw("invalid_token", 10000);
+
+        act.Should().Throw<UnauthorizedException>();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-10)]
+    public void Withdraw_ShouldThrow_WhenAmountIsInvalid(decimal invalidAmount)
+    {
+        _userRepo.Setup(r => r.GetByToken("tok")).Returns(CreateCustomer("tok"));
+        _walletRepo.Setup(r => r.GetByUserId(1)).Returns(new Wallet { Id = 1, UserId = 1, Balance = 500000 });
+
+        var act = () => _service.Withdraw("tok", invalidAmount);
+
+        act.Should().Throw<RequestValidationException>();
+    }
+
+    [Fact]
+    public void Withdraw_ShouldThrow_WhenAmountExceedsBalance()
+    {
+        _userRepo.Setup(r => r.GetByToken("tok")).Returns(CreateCustomer("tok"));
+        _walletRepo.Setup(r => r.GetByUserId(1)).Returns(new Wallet { Id = 1, UserId = 1, Balance = 500000 });
+
+        var act = () => _service.Withdraw("tok", 500001);
+
+        act.Should().Throw<ConflictException>();
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(250000)]
+    [InlineData(500000)]
+    public void Withdraw_ShouldDeductBalance_WhenAmountIsValid(decimal validAmount)
+    {
+        _userRepo.Setup(r => r.GetByToken("tok")).Returns(CreateCustomer("tok"));
+        var wallet = new Wallet { Id = 1, UserId = 1, Balance = 500000 };
+        _walletRepo.Setup(r => r.GetByUserId(1)).Returns(wallet);
+        _walletRepo.Setup(r => r.Update(It.IsAny<Wallet>())).Returns<Wallet>(w => w);
+        _walletRepo.Setup(r => r.CreateTransaction(It.IsAny<WalletTransaction>()));
+
+        var result = _service.Withdraw("tok", validAmount);
+
+        result.Balance.Should().Be(500000 - validAmount);
+        _walletRepo.Verify(r => r.Update(It.IsAny<Wallet>()), Times.Once);
+        _walletRepo.Verify(r => r.CreateTransaction(It.IsAny<WalletTransaction>()), Times.Once);
     }
 }
