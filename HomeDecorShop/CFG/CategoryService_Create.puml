@@ -18,7 +18,7 @@ endif
   .FirstOrDefault(c =>
     NormalizeLookup(c.Name) == normalizedName
     and c.Id != null);
-note right: excludedCategoryId = null khi Create\n→ điều kiện c.Id != null luôn true với\nmọi category đã tồn tại
+
 if (existingName is not null?) then (yes)
   :throw ConflictException(CategoryNameAlreadyExists);
   stop
