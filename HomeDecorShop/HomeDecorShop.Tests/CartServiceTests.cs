@@ -22,79 +22,78 @@ public class CartServiceTests
             _productRepo.Object);
     }
 
-    private const string ValidToken = "valid_token";
-    private const string InvalidToken = "invalid_token";
+    private const string ValidToken = "test_valid_token";
+    private const string InvalidToken = "test_invalid_token";
 
     [Fact]
-    public void AddItem_ShouldThrowUnauthorizedException_WhenTokenIsInvalid()
+    public void AddItem_WhenTokenIsInvalid_ShouldThrowUnauthorizedException()
     {
         // Arrange
-        var input = new AddCartItemInput { ProductId = 1, Quantity = 2 };
-        _userRepo.Setup(x => x.GetByToken(InvalidToken)).Returns((User)null);
+        var request = new AddCartItemInput { ProductId = 5, Quantity = 1 };
+        _userRepo.Setup(r => r.GetByToken(InvalidToken)).Returns((User)null);
 
         // Act
-        Action act = () => _cartService.AddItem(InvalidToken, input);
+        Action action = () => _cartService.AddItem(InvalidToken, request);
 
         // Assert
-        act.Should().Throw<UnauthorizedException>()
-           .WithMessage("Authentication token is invalid or has expired.");
+        action.Should().Throw<UnauthorizedException>()
+              .WithMessage("Authentication token is invalid or has expired.");
     }
 
     [Fact]
-    public void AddItem_ShouldUpdateCart_WhenProductIsValidAndStockIsEnough()
+    public void AddItem_WhenProductExistsAndStockSufficient_ShouldUpdateCartSuccessfully()
     {
         // Arrange
-        var input = new AddCartItemInput { ProductId = 100, Quantity = 2 };
-        var user = new User { UserId = 1 };
-        var product = new Product { ProductId = 100, Price = 50000, IsActive = true, StockLeft = 10 };
-        var cart = new Cart { UserId = 1, Items = new List<CartItem>() };
+        var request = new AddCartItemInput { ProductId = 200, Quantity = 3 };
+        var existingUser = new User { UserId = 10 };
+        var availableProduct = new Product { ProductId = 200, Price = 120000, IsActive = true, StockLeft = 15 };
+        var userCart = new Cart { UserId = 10, Items = new List<CartItem>() };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _productRepo.Setup(x => x.GetById(input.ProductId)).Returns(product);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
-        _cartRepo.Setup(x => x.Update(It.IsAny<Cart>())).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _productRepo.Setup(r => r.GetById(request.ProductId)).Returns(availableProduct);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(userCart);
+        _cartRepo.Setup(r => r.Update(It.IsAny<Cart>())).Returns(userCart);
 
         // Act
-        var result = _cartService.AddItem(ValidToken, input);
+        var updatedCart = _cartService.AddItem(ValidToken, request);
 
         // Assert
-        result.Should().NotBeNull();
-        result.TotalQuantity.Should().Be(2);
-        _cartRepo.Verify(x => x.Update(It.IsAny<Cart>()), Times.Once);
+        updatedCart.Should().NotBeNull();
+        updatedCart.TotalQuantity.Should().Be(3);
+        _cartRepo.Verify(r => r.Update(It.IsAny<Cart>()), Times.Once);
     }
 
     [Fact]
-    public void AddItem_ShouldThrowConflictException_WhenQuantityExceedsStock()
+    public void AddItem_WhenRequestedQuantityExceedsStock_ShouldThrowConflictException()
     {
         // Arrange
-        var input = new AddCartItemInput { ProductId = 100, Quantity = 5 };
-        var user = new User { UserId = 1 };
-        var product = new Product { ProductId = 100, IsActive = true, StockLeft = 3 };
-        var cart = new Cart { UserId = 1, Items = new List<CartItem>() };
+        var request = new AddCartItemInput { ProductId = 200, Quantity = 10 };
+        var existingUser = new User { UserId = 10 };
+        var limitedProduct = new Product { ProductId = 200, IsActive = true, StockLeft = 4 };
+        var userCart = new Cart { UserId = 10, Items = new List<CartItem>() };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _productRepo.Setup(x => x.GetById(input.ProductId)).Returns(product);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _productRepo.Setup(r => r.GetById(request.ProductId)).Returns(limitedProduct);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(userCart);
 
         // Act
-        Action act = () => _cartService.AddItem(ValidToken, input);
+        Action action = () => _cartService.AddItem(ValidToken, request);
 
         // Assert
-        act.Should().Throw<ConflictException>()
-           .WithMessage("Selected quantity exceeds available stock for product 100.");
+        action.Should().Throw<ConflictException>()
+              .WithMessage("Selected quantity exceeds available stock for product 200.");
     }
 
     [Fact]
-    public void GetCurrent_ShouldCreateNewCart_WhenCartDoesNotExist()
+    public void GetCurrent_WhenNoCartExists_ShouldCreateAndReturnNewCart()
     {
         // Arrange
-        var user = new User { UserId = 1 };
+        var existingUser = new User { UserId = 10 };
+        var freshCart = new Cart { UserId = 10, Items = new List<CartItem>() };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns((Cart)null);
-
-        var newCart = new Cart { UserId = 1, Items = new List<CartItem>() };
-        _cartRepo.Setup(x => x.Create(It.IsAny<Cart>())).Returns(newCart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns((Cart)null);
+        _cartRepo.Setup(r => r.Create(It.IsAny<Cart>())).Returns(freshCart);
 
         // Act
         var result = _cartService.GetCurrent(ValidToken);
@@ -102,99 +101,99 @@ public class CartServiceTests
         // Assert
         result.Should().NotBeNull();
         result.Items.Should().BeEmpty();
-        _cartRepo.Verify(x => x.Create(It.IsAny<Cart>()), Times.Once);
+        _cartRepo.Verify(r => r.Create(It.IsAny<Cart>()), Times.Once);
     }
 
     [Fact]
-    public void UpdateItem_ShouldThrowNotFound_WhenItemNotInCart()
+    public void UpdateItem_WhenCartItemDoesNotExist_ShouldThrowNotFoundException()
     {
         // Arrange
-        var itemId = 999;
-        var input = new UpdateCartItemQuantityInput { Quantity = 5 };
-        var user = new User { UserId = 1 };
-        var cart = new Cart { UserId = 1, Items = new List<CartItem>() };
+        var targetItemId = 777;
+        var request = new UpdateCartItemQuantityInput { Quantity = 2 };
+        var existingUser = new User { UserId = 10 };
+        var emptyCart = new Cart { UserId = 10, Items = new List<CartItem>() };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(emptyCart);
 
         // Act
-        Action act = () => _cartService.UpdateItem(ValidToken, itemId, input);
+        Action action = () => _cartService.UpdateItem(ValidToken, targetItemId, request);
 
         // Assert
-        act.Should().Throw<NotFoundException>()
-           .WithMessage($"Cart item with id {itemId} was not found.");
+        action.Should().Throw<NotFoundException>()
+              .WithMessage($"Cart item with id {targetItemId} was not found.");
     }
 
     [Fact]
-    public void UpdateItem_ShouldUpdateQuantity_WhenValid()
+    public void UpdateItem_WhenItemExistsAndQuantityIsValid_ShouldUpdateSuccessfully()
     {
         // Arrange
-        var itemId = 10;
-        var input = new UpdateCartItemQuantityInput { Quantity = 3 };
-        var user = new User { UserId = 1 };
+        var targetItemId = 20;
+        var request = new UpdateCartItemQuantityInput { Quantity = 4 };
+        var existingUser = new User { UserId = 10 };
+        var existingProduct = new Product { ProductId = 300, Price = 75000, IsActive = true, StockLeft = 20 };
+        var existingItem = new CartItem { Id = targetItemId, ProductId = 300, Quantity = 2 };
+        var userCart = new Cart { UserId = 10, Items = new List<CartItem> { existingItem } };
 
-        var product = new Product { ProductId = 100, Price = 50000, IsActive = true, StockLeft = 10 };
-        var cartItem = new CartItem { Id = itemId, ProductId = 100, Quantity = 1 };
-        var cart = new Cart { UserId = 1, Items = new List<CartItem> { cartItem } };
-
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
-        _productRepo.Setup(x => x.GetById(cartItem.ProductId)).Returns(product);
-        _cartRepo.Setup(x => x.Update(It.IsAny<Cart>())).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(userCart);
+        _productRepo.Setup(r => r.GetById(existingItem.ProductId)).Returns(existingProduct);
+        _cartRepo.Setup(r => r.Update(It.IsAny<Cart>())).Returns(userCart);
 
         // Act
-        var result = _cartService.UpdateItem(ValidToken, itemId, input);
+        var result = _cartService.UpdateItem(ValidToken, targetItemId, request);
 
         // Assert
-        result.TotalQuantity.Should().Be(3);
-        _cartRepo.Verify(x => x.Update(It.IsAny<Cart>()), Times.Once);
+        result.TotalQuantity.Should().Be(4);
+        _cartRepo.Verify(r => r.Update(It.IsAny<Cart>()), Times.Once);
     }
 
     [Fact]
-    public void RemoveItem_ShouldReturnTrue_WhenItemIsRemoved()
+    public void RemoveItem_WhenItemExistsInCart_ShouldRemoveAndReturnTrue()
     {
         // Arrange
-        var itemId = 5;
-        var user = new User { UserId = 1 };
-        var cartItem = new CartItem { Id = itemId };
-        var cart = new Cart { UserId = 1, Items = new List<CartItem> { cartItem } };
+        var targetItemId = 8;
+        var existingUser = new User { UserId = 10 };
+        var itemToRemove = new CartItem { Id = targetItemId };
+        var userCart = new Cart { UserId = 10, Items = new List<CartItem> { itemToRemove } };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(userCart);
 
         // Act
-        var result = _cartService.RemoveItem(ValidToken, itemId);
+        var isRemoved = _cartService.RemoveItem(ValidToken, targetItemId);
 
         // Assert
-        result.Should().BeTrue();
-        cart.Items.Should().BeEmpty();
-        _cartRepo.Verify(x => x.Update(It.IsAny<Cart>()), Times.Once);
+        isRemoved.Should().BeTrue();
+        userCart.Items.Should().BeEmpty();
+        _cartRepo.Verify(r => r.Update(It.IsAny<Cart>()), Times.Once);
     }
 
     [Fact]
-    public void Clear_ShouldEmptyCart_WhenCartExists()
+    public void Clear_WhenCartHasItems_ShouldRemoveAllItemsAndReturnTrue()
     {
         // Arrange
-        var user = new User { UserId = 1 };
-        var cart = new Cart
+        var existingUser = new User { UserId = 10 };
+        var userCart = new Cart
         {
-            UserId = 1,
+            UserId = 10,
             Items = new List<CartItem>
             {
-                new() { Id = 1 },
-                new() { Id = 2 }
+                new() { Id = 11 },
+                new() { Id = 22 },
+                new() { Id = 33 }
             }
         };
 
-        _userRepo.Setup(x => x.GetByToken(ValidToken)).Returns(user);
-        _cartRepo.Setup(x => x.GetByUserId(user.UserId)).Returns(cart);
+        _userRepo.Setup(r => r.GetByToken(ValidToken)).Returns(existingUser);
+        _cartRepo.Setup(r => r.GetByUserId(existingUser.UserId)).Returns(userCart);
 
         // Act
-        var result = _cartService.Clear(ValidToken);
+        var isCleared = _cartService.Clear(ValidToken);
 
         // Assert
-        result.Should().BeTrue();
-        cart.Items.Should().BeEmpty();
-        _cartRepo.Verify(x => x.Update(It.IsAny<Cart>()), Times.Once);
+        isCleared.Should().BeTrue();
+        userCart.Items.Should().BeEmpty();
+        _cartRepo.Verify(r => r.Update(It.IsAny<Cart>()), Times.Once);
     }
 }
