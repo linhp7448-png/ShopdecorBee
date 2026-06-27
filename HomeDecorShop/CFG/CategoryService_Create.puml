@@ -2,7 +2,6 @@
 start
 :name = NormalizeName(input.Name);
 :slug = NormalizeSlug(input.Slug);
-
 :group = repository.GetGroupById(input.GroupId);
 if (group is null?) then (yes)
   :throw ConflictException(CategoryGroupInvalid);
@@ -12,31 +11,27 @@ if (group.IsActive == false?) then (yes)
   :throw ConflictException(CategoryGroupInactive);
   stop
 endif
-
 :normalizedName = NormalizeLookup(name);
 :existingName = repository.GetAll()
   .FirstOrDefault(c =>
     NormalizeLookup(c.Name) == normalizedName
-    and c.Id != null);
+    and c.Id != excludedCategoryId);
 
 if (existingName is not null?) then (yes)
   :throw ConflictException(CategoryNameAlreadyExists);
   stop
 endif
-
 :existingSlug = repository.GetBySlug(slug);
-if (existingSlug is not null AND existingSlug.Id != null?) then (yes)
+if (existingSlug is not null\nand existingSlug.Id != excludedCategoryId?) then (yes)
   :throw ConflictException(CategorySlugAlreadyExists);
   stop
 endif
-
 :categoryToCreate = new Category {
   Name = name,
   Slug = slug,
   GroupId = group.Id,
   IsActive = input.IsActive
 };
-
 :created = repository.Create(categoryToCreate);
 :return MapCategory(created);
 stop
