@@ -30,9 +30,16 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{customerEmail}}\",\n  \"password\": \"{{customerPassword}}\"\n}"
@@ -61,9 +68,16 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
@@ -104,10 +118,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
@@ -148,10 +173,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Nguyen Van Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"Phuong 1\",\n  \"district\": \"Quan 1\",\n  \"city\": \"TP.HCM\",\n  \"notes\": \"TC-ORD-01 tao don\"\n}"
@@ -175,9 +211,16 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
@@ -216,10 +259,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
@@ -243,10 +297,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
@@ -271,10 +336,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Nguyen Van Cancel\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\",\n  \"notes\": \"Don de huy\"\n}"
@@ -306,7 +382,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -332,7 +414,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -355,7 +443,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -376,7 +470,9 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/orders/{{orderId}}"
@@ -406,7 +502,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -431,7 +533,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -454,7 +562,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [],
@@ -475,7 +589,9 @@
             }
           ],
           "request": {
-            "auth": { "type": "noauth" },
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
             "url": "{{baseUrl}}/api/orders/{{orderId}}/cancel"
@@ -505,7 +621,13 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "GET",
             "header": [],
@@ -531,15 +653,34 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=processing",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
-              "query": [{ "key": "status", "value": "processing" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{orderCancelId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "processing"
+                }
+              ]
             }
           }
         },
@@ -562,15 +703,34 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=completed",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
-              "query": [{ "key": "status", "value": "completed" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{orderCancelId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed"
+                }
+              ]
             }
           }
         },
@@ -592,15 +752,34 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{orderCancelId}}/status?status=processing",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{orderCancelId}}", "status"],
-              "query": [{ "key": "status", "value": "processing" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{orderCancelId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "processing"
+                }
+              ]
             }
           }
         },
@@ -620,15 +799,34 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "PATCH",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/999999/status?status=processing",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "999999", "status"],
-              "query": [{ "key": "status", "value": "processing" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "999999",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "processing"
+                }
+              ]
             }
           }
         }
@@ -653,10 +851,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"productId\": {{productId}},\n  \"quantity\": 1\n}"
@@ -680,10 +889,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"fullName\": \"Refund Test\",\n  \"phone\": \"0901234567\",\n  \"line1\": \"123 Le Loi\",\n  \"ward\": \"P1\",\n  \"district\": \"Q1\",\n  \"city\": \"HCM\"\n}"
@@ -707,10 +927,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"orderId\": {{refundOrderId}},\n  \"method\": \"cod\"\n}"
@@ -737,10 +968,21 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"reason\": \"San pham loi - TC-ORD-18\"\n}"
@@ -767,15 +1009,34 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/admin/orders/{{refundOrderId}}/process-refund?approve=true",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "admin", "orders", "{{refundOrderId}}", "process-refund"],
-              "query": [{ "key": "approve", "value": "true" }]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "{{refundOrderId}}",
+                "process-refund"
+              ],
+              "query": [
+                {
+                  "key": "approve",
+                  "value": "true"
+                }
+              ]
             }
           }
         },
@@ -795,15 +1056,189 @@
           "request": {
             "auth": {
               "type": "bearer",
-              "bearer": [{ "key": "token", "value": "{{customerToken}}", "type": "string" }]
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
             },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"reason\": \"Khiếu nại lần 2\"\n}"
             },
             "url": "{{baseUrl}}/api/orders/{{refundOrderId}}/request-refund"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💰 Refund & Khiếu Nại (Bổ sung Black-box)",
+      "item": [
+        {
+          "name": "POST Request Refund (Thành công)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Yêu cầu khiếu nại thành công - Status 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Status đơn hàng chuyển thành refund_requested', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.status).to.eql('refund_requested');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{customerToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Hàng bị vỡ trong quá trình vận chuyển\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/1/request-refund",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "orders",
+                "1",
+                "request-refund"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Process Refund (Admin chấp nhận)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Admin duyệt hoàn tiền - Status 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Status chuyển thành refunded', () => {",
+                  "    const data = pm.response.json();",
+                  "    pm.expect(data.status).to.eql('refunded');",
+                  "    pm.expect(data.paymentStatus).to.eql('refunded');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/1/process-refund?approve=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "1",
+                "process-refund"
+              ],
+              "query": [
+                {
+                  "key": "approve",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Process Refund (Từ chối - Lỗi)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Từ chối khi đơn không ở trạng thái yêu cầu hoàn tiền - Status 409', () => {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/orders/2/process-refund?approve=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "orders",
+                "2",
+                "process-refund"
+              ],
+              "query": [
+                {
+                  "key": "approve",
+                  "value": "false"
+                }
+              ]
+            }
           }
         }
       ]
