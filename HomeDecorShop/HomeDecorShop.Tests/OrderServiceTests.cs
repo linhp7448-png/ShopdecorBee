@@ -337,4 +337,89 @@ public class OrderServiceTests
         result!.Status.Should().Be("completed");
         result.PaymentStatus.Should().Be("paid");
     }
+    [Fact]
+    public void RequestRefund_ShouldReturnNull_WhenOrderNotFoundOrNotOwned()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _orders.Setup(r => r.GetById(1)).Returns(new Order { Id = 1, UserId = 99, Items = new List<OrderItem>() });
+        _service.RequestRefund("tok", 1, "Lý do").Should().BeNull();
+    }
+
+    [Fact]
+    public void RequestRefund_ShouldThrow_WhenPaymentNotPaid()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _orders.Setup(r => r.GetById(1)).Returns(new Order { Id = 1, UserId = 1, PaymentStatus = PaymentStatus.Pending, Items = new List<OrderItem>() });
+        var act = () => _service.RequestRefund("tok", 1, "Lý do");
+        act.Should().Throw<ConflictException>().WithMessage("*đã thanh toán mới được khiếu nại*");
+    }
+
+    [Fact]
+    public void RequestRefund_ShouldThrow_WhenAlreadyRefundRequested()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        _orders.Setup(r => r.GetById(1)).Returns(new Order { Id = 1, UserId = 1, PaymentStatus = PaymentStatus.Paid, Status = OrderStatus.RefundRequested, Items = new List<OrderItem>() });
+        var act = () => _service.RequestRefund("tok", 1, "Lý do");
+        act.Should().Throw<ConflictException>().WithMessage("*đã gửi yêu cầu khiếu nại*");
+    }
+
+    [Fact]
+    public void RequestRefund_ShouldUpdateStatusAndNotes_WhenValid()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var order = new Order { Id = 1, UserId = 1, PaymentStatus = PaymentStatus.Paid, Status = OrderStatus.Completed, Items = new List<OrderItem>() };
+        _orders.Setup(r => r.GetById(1)).Returns(order);
+        _orders.Setup(r => r.Update(It.IsAny<Order>())).Returns<Order>(o => o);
+
+        var result = _service.RequestRefund("tok", 1, "Hàng vỡ");
+
+        result!.Status.Should().Be("refund_requested");
+        order.Notes.Should().Contain("[KHIẾU NẠI]: Hàng vỡ");
+    }
+
+    [Fact]
+    public void ProcessRefund_ShouldThrow_WhenNotAdmin()
+    {
+        _users.Setup(r => r.GetByToken("tok")).Returns(Customer);
+        var act = () => _service.ProcessRefund("tok", 1, true);
+        act.Should().Throw<ForbiddenException>();
+    }
+
+    [Fact]
+    public void ProcessRefund_ShouldThrow_WhenNotRefundRequested()
+    {
+        _users.Setup(r => r.GetByToken("admin-tok")).Returns(Admin);
+        _orders.Setup(r => r.GetById(1)).Returns(new Order { Id = 1, Status = OrderStatus.Completed, Items = new List<OrderItem>() });
+        var act = () => _service.ProcessRefund("admin-tok", 1, true);
+        act.Should().Throw<ConflictException>().WithMessage("*Đơn hàng không ở trạng thái*");
+    }
+
+    [Fact]
+    public void ProcessRefund_ShouldRefundToWallet_WhenApproved()
+    {
+        _users.Setup(r => r.GetByToken("admin-tok")).Returns(Admin);
+        var order = new Order { Id = 1, UserId = 1, Status = OrderStatus.RefundRequested, TotalAmount = 1000, OrderNumber = "O-1", Items = new List<OrderItem>() };
+        _orders.Setup(r => r.GetById(1)).Returns(order);
+        _orders.Setup(r => r.Update(It.IsAny<Order>())).Returns<Order>(o => o);
+
+        var result = _service.ProcessRefund("admin-tok", 1, true);
+
+        result!.Status.Should().Be("refunded");
+        result.PaymentStatus.Should().Be("refunded");
+        _wallet.Verify(w => w.ProcessRefundPayment(1, 1000, "O-1"), Times.Once);
+    }
+
+    [Fact]
+    public void ProcessRefund_ShouldSetToCompleted_WhenRejected()
+    {
+        _users.Setup(r => r.GetByToken("admin-tok")).Returns(Admin);
+        var order = new Order { Id = 1, UserId = 1, Status = OrderStatus.RefundRequested, Items = new List<OrderItem>() };
+        _orders.Setup(r => r.GetById(1)).Returns(order);
+        _orders.Setup(r => r.Update(It.IsAny<Order>())).Returns<Order>(o => o);
+
+        var result = _service.ProcessRefund("admin-tok", 1, false);
+
+        result!.Status.Should().Be("completed");
+        _wallet.Verify(w => w.ProcessRefundPayment(It.IsAny<int>(), It.IsAny<decimal>(), It.IsAny<string>()), Times.Never);
+    }
 }
