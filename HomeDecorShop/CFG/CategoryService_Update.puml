@@ -12,17 +12,13 @@ else (no)
   :name = NormalizeName(input.Name);
   :slug = NormalizeSlug(input.Slug);
   :group = RequireActiveGroup(input.GroupId);
-  note right: throw ConflictException nếu GroupId\nkhông tồn tại hoặc group inactive
-
+  
   :EnsureUniqueName(name, categoryId);
-  note right: throw ConflictException nếu\ntrùng Name với category khác
-
+  
   :EnsureUniqueSlug(slug, categoryId);
-  note right: throw ConflictException nếu\ntrùng Slug với category khác
-
+ 
   :EnsureCanDeactivate(category, input.IsActive);
-  note right: throw ConflictException nếu deactivate\ncategory đang còn active products
-
+  
   :category.Name = name;
   :category.Slug = slug;
   :category.GroupId = group.Id;
