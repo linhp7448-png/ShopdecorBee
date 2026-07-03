@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "Blackbox Testing - Payment Service (5 POST)",
+    "description": "Payment Service blackbox testing - 5 POST test cases",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "06 - Payment Service (5 POST)",
+      "item": [
+        {
+          "name": "TC_PAY_01_Process_Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"method\": \"cod\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201 or 409 (Order already paid)', function () {",
+                  "  pm.expect([201, 409]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC_PAY_02_Process_OrderNotFound",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 99999,\n  \"method\": \"cod\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 Not Found', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC_PAY_03_Process_OrderAlreadyPaid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"method\": \"cod\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 409 Conflict', function () {",
+                  "  pm.response.to.have.status(409);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC_PAY_04_Process_Unauthorized",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"method\": \"cod\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401 Unauthorized', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC_PAY_05_Process_InvalidMethod",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": {{orderId}},\n  \"method\": \"invalid\"\n}"
+            },
+            "url": "{{baseUrl}}/api/payments"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400 Bad Request', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
